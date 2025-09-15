@@ -1083,6 +1083,11 @@
                         updateCoordinates(marker.getLatLng().lat, marker.getLatLng().lng);
                     }
                 });
+
+                function updateHiddenCoords(lat, lng, resourceType, resourceId) {
+                    document.getElementById(`latitud_${resourceId}`).value = lat;
+                    document.getElementById(`longitud_${resourceId}`).value = lng;
+                }
                 
                 return {
                     map: map,
@@ -1387,6 +1392,9 @@
                             <label>6. Identifique la Ubicación en el mapa</label>
                             <div id="map-container-transporte-${resource.count}" class="map-container"></div>
                             <p class="hint">Puede buscarlo con el siguiente formato: Calle n°, Comuna, Región <strong>Ejemplo: Los Robles 540, La Cisterna, Región Metropolitana</strong></p>
+                            <!-- Campos para coordenadas (deben agregarse en cada recurso) -->
+                            <input type="hidden" name="latitud_${resource.count}" id="latitud_${resource.count}" value="">
+                            <input type="hidden" name="longitud_${resource.count}" id="longitud_${resource.count}" value="">
                         </div>
                         
                         <div class="form-group">
@@ -1629,6 +1637,9 @@
                             <label>5. Ubicación en el mapa</label>
                             <div id="map-container-humano-${resource.count}" class="map-container"></div>
                             <p class="hint">Puede buscarlo con el siguiente formato: Calle n°, Comuna, Región <strong>Ejemplo: Los Robles 540, La Cisterna, Región Metropolitana</strong></p>
+                            <!-- Campos para coordenadas (deben agregarse en cada recurso) -->
+                            <input type="hidden" name="latitud_${resource.count}" id="latitud_${resource.count}" value="">
+                            <input type="hidden" name="longitud_${resource.count}" id="longitud_${resource.count}" value="">
                         </div>
                         
                         <div class="form-group">
@@ -2020,6 +2031,9 @@
                             <label>5. Ubicación en el mapa</label>
                             <div id="map-container-herramienta-${resource.count}" class="map-container"></div>
                             <p class="hint">Puede buscarlo con el siguiente formato: Calle n°, Comuna, Región <strong>Ejemplo: Los Robles 540, La Cisterna, Región Metropolitana</strong></p>
+                            <!-- Campos para coordenadas (deben agregarse en cada recurso) -->
+                            <input type="hidden" name="latitud_${resource.count}" id="latitud_${resource.count}" value="">
+                            <input type="hidden" name="longitud_${resource.count}" id="longitud_${resource.count}" value="">
                         </div>
                         
                         <div class="form-group">
@@ -2473,4 +2487,5 @@ document.getElementById('main-form').addEventListener('submit', function(e) {
       });
     </script>
 </body>
+
 </html>
