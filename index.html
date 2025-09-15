@@ -674,7 +674,7 @@
 </head>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const form = document.getElementById('mi_formulario'); // Usa el id de tu formulario
+  const form = document.getElementById('1qxX4TY3Vm8A6RAe3oE22AnWuZ0ioTpAd4E0xdEiE_WQ'); // Usa el id de tu formulario
   if (form) {
     form.addEventListener('submit', function(event) {
       event.preventDefault();
@@ -686,7 +686,7 @@ document.addEventListener('DOMContentLoaded', function() {
       let isBasicInfo = formData.isBasicInfo === 'on' || false;
       let timestamp = new Date().toISOString();
 
-      fetch('WEBAPP_URL', {
+      fetch('https://script.google.com/macros/s/AKfycbxN2b8Y-qp0WSB8U4t6d3zxpMBRufFMMAXS-w3SUkcWfBvyzsAyqQZgygAow-jnqgUuHw/exec', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -2512,3 +2512,4 @@ document.getElementById('main-form').addEventListener('submit', function(e) {
     </script>
 </body>
 </html>
+
