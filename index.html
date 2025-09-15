@@ -672,44 +672,6 @@
         }
     </style>
 </head>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const form = document.getElementById('1qxX4TY3Vm8A6RAe3oE22AnWuZ0ioTpAd4E0xdEiE_WQ'); // Usa el id de tu formulario
-  if (form) {
-    form.addEventListener('submit', function(event) {
-      event.preventDefault();
-      const formData = {};
-      new FormData(form).forEach((value, key) => { formData[key] = value; });
-
-      // Ajusta estos valores según el tipo de info a guardar
-      let resourceType = formData.resourceType || 'transporte'; // Modifica según lógica en tu app
-      let isBasicInfo = formData.isBasicInfo === 'on' || false;
-      let timestamp = new Date().toISOString();
-
-      fetch('https://script.google.com/macros/s/AKfycbyP6rlBcBKvMZcWZ4_WUm5vZWrlhoU7THfEB1cxP3lSX5qNDSSc6EOHwrF2uAMbfE6ZxA/exec', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          formData, resourceType, isBasicInfo, timestamp
-        }),
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.result === 'success') {
-          alert('¡Respuesta enviada correctamente!');
-          form.reset();
-        } else {
-          alert('Hubo un error: ' + data.message);
-        }
-      })
-      .catch(error => {
-        alert('Error en la comunicación: ' + error.message);
-      });
-    });
-  }
-});
-</script>
-
 <body>
     <!-- Banner superior -->
     <div class="banner">
@@ -722,7 +684,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 Levantamiento de Recursos y Capacidades Comunales
             </div>
 
-            <form id="main-form">
+            <form id="main-form" method="POST" action="https://script.google.com/macros/s/AKfycbzYaSb_c5smhciFOuCssJFb729m4nSLxO1mDYLbmeZy1AfHrVxPjWBQTRDP44GQhei2rA/exec" onsubmit="return enviarFormulario(event)">
                 <!-- Sección de Información Básica -->
                 <div class="form-section">
                     <h2>Información Básica</h2>
@@ -2421,96 +2383,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         });
-
-        /// Función para enviar datos a Google Apps Script
-function submitToGoogleSheets(formData, resourceType, isBasicInfo = false) {
-    // URL CORRECTA de tu Google Apps Script (¡ACTUALIZA ESTA URL!)
-    const scriptURL = 'https://script.google.com/macros/s/TU_ID_VERDADERO/exec';
-    
-    console.log('Enviando datos a:', scriptURL);
-    
-    return fetch(scriptURL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            formData: formData,
-            resourceType: resourceType,
-            isBasicInfo: isBasicInfo,
-            timestamp: new Date().toISOString()
-        })
-    })
-    .then(response => {
-        console.log('Respuesta recibida, status:', response.status);
-        if (!response.ok) {
-            throw new Error(`Error HTTP: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Datos de respuesta:', data);
-        if (data.result === 'error') {
-            throw new Error(data.message || 'Error del servidor');
-        }
-        return data;
-    });
-}
-
-// Modificar el evento submit del formulario para mejor manejo de errores
-document.getElementById('main-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const submitBtn = this.querySelector('.submit-btn');
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Enviando...';
-    submitBtn.disabled = true;
-    
-    if (this.checkValidity()) {
-        // Obtener datos básicos
-        const formData = new FormData(this);
-        const basicData = {};
-        for (let [key, value] of formData.entries()) {
-            if (!key.includes('_transporte_') && 
-                !key.includes('_humanos_') && 
-                !key.includes('_herramientas_')) {
-                basicData[key] = value;
-            }
-        }
-        
-              // Enviar información básica
-              submitToGoogleSheets(basicData, 'informacion_basica', true)
-                  .then(() => {
-                      // Obtener tipo de recurso seleccionado
-                      const resourceType = document.getElementById('tipo_recurso').value;
-                      
-                      // Procesar recursos según el tipo
-                      if (resourceType === 'Medios de Transporte' && resources.transporte.count > 0) {
-                          // Tu lógica para procesar recursos de transporte
-                          console.log('Procesando recursos de transporte...');
-                      }
-                      // ... similar para humanos y herramientas
-                      
-                      // Mostrar mensaje de éxito
-                      document.getElementById('form-container').style.display = 'none';
-                      document.getElementById('thank-you').style.display = 'block';
-                  })
-                  .catch(error => {
-                      console.error('Error al enviar:', error);
-                      alert('Error: ' + error.message + '\nRevisa la consola (F12) para más detalles.');
-                  })
-                  .finally(() => {
-                      submitBtn.textContent = originalText;
-                      submitBtn.disabled = false;
-                  });
-          } else {
-              alert('Por favor complete todos los campos requeridos.');
-              submitBtn.textContent = originalText;
-              submitBtn.disabled = false;
-          }
-      });
     </script>
+    <script>
+  function enviarFormulario(event) {
+    event.preventDefault();
+    const form = document.getElementById('main-form');
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+      method: form.method,
+      body: formData,
+      mode: 'no-cors' // Para evitar problemas de CORS
+    }).then(() => {
+      alert("Su respuesta se ha enviado correctamente.");
+      form.reset();
+    }).catch(() => {
+      alert("Hubo un error al enviar el formulario.");
+    });
+
+    return false; // Evita el envío normal del formulario
+  }
+</script>
 </body>
 </html>
-
-
