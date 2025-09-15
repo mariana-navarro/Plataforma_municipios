@@ -854,6 +854,128 @@
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <script>
+        // URL de tu Web App de Google Apps Script (¡ACTUALIZA ESTA URL!)
+const scriptURL = 'https://script.google.com/macros/s/AKfycbwoDRRl2lQrpqq0EhQyQJRVF7KQ9Rbla4Bmvg6MwTDeenXg3HDZHUh4anV97XpiAuUezw/exec';
+
+document.getElementById('main-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    if (!this.checkValidity()) {
+        alert('Por favor complete todos los campos requeridos.');
+        return;
+    }
+        // Dentro del event listener submit, añade:
+    const requiredFields = this.querySelectorAll('[required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+            isValid = false;
+            field.style.borderColor = 'red';
+        } else {
+            field.style.borderColor = '';
+        }
+    });
+    
+    if (!isValid) {
+        alert('Por favor complete todos los campos requeridos.');
+        return;
+    }
+    
+    // Mostrar mensaje de carga
+    document.getElementById('form-loading').style.display = 'block';
+    document.getElementById('form-success').style.display = 'none';
+    document.getElementById('form-error').style.display = 'none';
+    
+    // Deshabilitar el botón de enviar
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Enviando...';
+    submitBtn.disabled = true;
+    
+    try {
+        // Recopilar todos los datos del formulario
+        const formData = new FormData(this);
+        
+        // Agregar información sobre recursos
+        formData.append('num_transporte', resources.transporte.count);
+        formData.append('num_humanos', resources.humanos.count);
+        formData.append('num_herramientas', resources.herramientas.count);
+        
+        // Convertir FormData a objeto simple
+        const data = {};
+        for (let [key, value] of formData.entries()) {
+            // Para checkboxes y campos múltiples
+            if (data[key] !== undefined) {
+                if (!Array.isArray(data[key])) {
+                    data[key] = [data[key]];
+                }
+                data[key].push(value);
+            } else {
+                data[key] = value;
+            }
+        }
+        
+        console.log('Datos a enviar:', data);
+        
+        // Enviar datos a Google Apps Script
+        const response = await fetch(scriptURL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        console.log('Respuesta del servidor:', result);
+        
+        if (response.ok && result.result === 'success') {
+            // Mostrar mensaje de éxito
+            document.getElementById('form-loading').style.display = 'none';
+            document.getElementById('form-success').style.display = 'block';
+            
+            // Limpiar formulario después de 3 segundos
+            setTimeout(() => {
+                this.reset();
+                document.getElementById('form-success').style.display = 'none';
+                
+                // Limpiar recursos
+                ['transporte', 'humanos', 'herramientas'].forEach(type => {
+                    resources[type].count = 0;
+                    resources[type].current = 0;
+                    resources[type].container.innerHTML = '';
+                    updateCounter(type);
+                });
+                
+                // Rehabilitar botón
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }, 3000);
+        } else {
+            throw new Error(result.error || 'Error en la respuesta del servidor');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('form-loading').style.display = 'none';
+        document.getElementById('form-error').style.display = 'block';
+        
+        // Mostrar error específico
+        const errorElement = document.getElementById('error-message');
+        if (errorElement) {
+            errorElement.textContent = error.toString();
+        }
+        
+        // Rehabilitar botón
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+        
+        // Ocultar mensaje de error después de 8 segundos
+        setTimeout(() => {
+            document.getElementById('form-error').style.display = 'none';
+        }, 8000);
+    }
+});
         document.addEventListener('DOMContentLoaded', function() {
             // Configurar fecha y hora actual
             const now = new Date();
@@ -1058,10 +1180,19 @@
                            lng >= -180 && lng <= 180;
                 }
 
-                // En la función initMap, después de crear los inputs de coordenadas
                 function updateHiddenCoords(lat, lng, resourceId) {
-                    document.getElementById(`latitud_${resourceId}`).value = lat;
-                    document.getElementById(`longitud_${resourceId}`).value = lng;
+                    const latHidden = document.getElementById(`latitud_${resourceId}`);
+                    const lngHidden = document.getElementById(`longitud_${resourceId}`);
+                    
+                    if (latHidden) latHidden.value = lat;
+                    if (lngHidden) lngHidden.value = lng;
+                }
+                
+                // Función para validar coordenadas
+                function isValidCoordinate(lat, lng) {
+                    return !isNaN(lat) && !isNaN(lng) && 
+                           lat >= -90 && lat <= 90 && 
+                           lng >= -180 && lng <= 180;
                 }
                 
                 // Actualizar coordenadas cuando se mueve el marcador
@@ -1110,6 +1241,7 @@
                         const newLatLng = L.latLng(lat, lng);
                         map.setView(newLatLng);
                         marker.setLatLng(newLatLng);
+                        updateHiddenCoords(lat, lng, resourceId); 
                     } else {
                         alert('Por favor ingrese coordenadas válidas');
                         updateCoordinates(marker.getLatLng().lat, marker.getLatLng().lng);
@@ -1124,6 +1256,7 @@
                         const newLatLng = L.latLng(lat, lng);
                         map.setView(newLatLng);
                         marker.setLatLng(newLatLng);
+                        updateHiddenCoords(lat, lng, resourceId); 
                     } else {
                         alert('Por favor ingrese coordenadas válidas');
                         updateCoordinates(marker.getLatLng().lat, marker.getLatLng().lng);
@@ -2213,11 +2346,11 @@
                 // Inicializar el mapa después de que el elemento exista en el DOM
                 setTimeout(() => {
                     if (type === 'transporte') {
-                        initMap(`map-container-transporte-${resource.count}`);
+                        resources.transporte.maps[resource.count] = initMap(`map-container-transporte-${resource.count}`, type, resource.count);
                     } else if (type === 'humanos') {
-                        initMap(`map-container-humano-${resource.count}`);
+                        resources.humanos.maps[resource.count] = initMap(`map-container-humano-${resource.count}`, type, resource.count);
                     } else if (type === 'herramientas') {
-                        initMap(`map-container-herramienta-${resource.count}`);
+                        resources.herramientas.maps[resource.count] = initMap(`map-container-herramienta-${resource.count}`, type, resource.count);
                     }
                 }, 0);
             }
@@ -2426,125 +2559,11 @@
                     }
                 }
             }
-            
-            document.getElementById('main-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                if (this.checkValidity()) {
-                    document.getElementById('form-container').style.display = 'none';
-                    document.getElementById('thank-you').style.display = 'block';
-                } else {
-                    alert('Por favor complete todos los campos requeridos.');
-                }
             });
         });
-// URL de tu Web App de Google Apps Script (¡ACTUALIZA ESTA URL!)
-const scriptURL = 'https://script.google.com/macros/s/AKfycbwoDRRl2lQrpqq0EhQyQJRVF7KQ9Rbla4Bmvg6MwTDeenXg3HDZHUh4anV97XpiAuUezw/exec';
-
-document.getElementById('main-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    if (!this.checkValidity()) {
-        alert('Por favor complete todos los campos requeridos.');
-        return;
-    }
-    
-    // Mostrar mensaje de carga
-    document.getElementById('form-loading').style.display = 'block';
-    document.getElementById('form-success').style.display = 'none';
-    document.getElementById('form-error').style.display = 'none';
-    
-    // Deshabilitar el botón de enviar
-    const submitBtn = this.querySelector('button[type="submit"]');
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Enviando...';
-    submitBtn.disabled = true;
-    
-    try {
-        // Recopilar todos los datos del formulario
-        const formData = new FormData(this);
-        
-        // Agregar información sobre recursos
-        formData.append('num_transporte', resources.transporte.count);
-        formData.append('num_humanos', resources.humanos.count);
-        formData.append('num_herramientas', resources.herramientas.count);
-        
-        // Convertir FormData a objeto simple
-        const data = {};
-        for (let [key, value] of formData.entries()) {
-            // Para checkboxes y campos múltiples
-            if (data[key] !== undefined) {
-                if (!Array.isArray(data[key])) {
-                    data[key] = [data[key]];
-                }
-                data[key].push(value);
-            } else {
-                data[key] = value;
-            }
-        }
-        
-        console.log('Datos a enviar:', data);
-        
-        // Enviar datos a Google Apps Script
-        const response = await fetch(scriptURL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-        
-        const result = await response.json();
-        console.log('Respuesta del servidor:', result);
-        
-        if (response.ok && result.result === 'success') {
-            // Mostrar mensaje de éxito
-            document.getElementById('form-loading').style.display = 'none';
-            document.getElementById('form-success').style.display = 'block';
-            
-            // Limpiar formulario después de 3 segundos
-            setTimeout(() => {
-                this.reset();
-                document.getElementById('form-success').style.display = 'none';
-                
-                // Limpiar recursos
-                ['transporte', 'humanos', 'herramientas'].forEach(type => {
-                    resources[type].count = 0;
-                    resources[type].current = 0;
-                    resources[type].container.innerHTML = '';
-                    updateCounter(type);
-                });
-                
-                // Rehabilitar botón
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalText;
-            }, 3000);
-        } else {
-            throw new Error(result.error || 'Error en la respuesta del servidor');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('form-loading').style.display = 'none';
-        document.getElementById('form-error').style.display = 'block';
-        
-        // Mostrar error específico
-        const errorElement = document.getElementById('error-message');
-        if (errorElement) {
-            errorElement.textContent = error.toString();
-        }
-        
-        // Rehabilitar botón
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
-        
-        // Ocultar mensaje de error después de 8 segundos
-        setTimeout(() => {
-            document.getElementById('form-error').style.display = 'none';
-        }, 8000);
-    }
-});
     </script>
 </body>
 
 </html>
+
 
