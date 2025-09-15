@@ -684,43 +684,20 @@
                 Levantamiento de Recursos y Capacidades Comunales
             </div>
 
-            <form id="simple-form" method="POST" action="https://script.google.com/macros/s/AKfycbxZb17K2JwpqHUUvkxq6JeHSETZdM1VG2USk2f05puSnW4IPtxml1DISgnY6nNGAQNnwg/exec" onsubmit="return enviarFormulario2(event)">
-  <label>Dato 1: <input type="text" name="dato1" required></label>
-  <button type="submit">Enviar</button>
-</form>
+            <!-- Mensajes de estado -->
+            <div id="form-success" class="form-message form-success">
+                ¡Formulario enviado con éxito! Los datos han sido guardados correctamente.
+            </div>
+            
+            <div id="form-error" class="form-message form-error">
+                Ha ocurrido un error al enviar el formulario. Por favor, inténtelo de nuevo.
+            </div>
+            
+            <div id="form-loading" class="form-message form-loading">
+                Enviando datos, por favor espere...
+            </div>
 
-<script>
-function enviarFormulario2(e) {
-  e.preventDefault();
-  const form = document.getElementById('simple-form');
-  const formData = new FormData(form);
-  
-  fetch(form.action, {
-    method: 'POST',
-    body: formData,
-    headers: {
-      'Accept': 'application/json'
-    }
-  })
-  .then(response => response.json())
-  .then(data => {
-    if(data.result === "success") {
-      alert("Envío exitoso");
-      form.reset();
-    } else {
-      alert("Error en respuesta");
-    }
-  })
-  .catch(error => {
-    alert("Error al enviar el formulario: " + error.message);
-  });
-
-  return false;
-}
-</script>
-
-
-            <form id="main-form" method="POST" action="https://script.google.com/macros/s/AKfycbyizjnzdpmOAr8TeaoupOdnGtpcscpa3ZgJoigAydhmL71FIX9GTU-2Uy4ikqzxoPqADg/exec" onsubmit="return enviarFormulario(event)">
+            <form id="main-form">
                 <!-- Sección de Información Básica -->
                 <div class="form-section">
                     <h2>Información Básica</h2>
@@ -852,6 +829,9 @@ function enviarFormulario2(e) {
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <script>
+        // URL del Web App de Google Apps Script (REEMPLAZAR CON TU URL)
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyr7Mhg2QlVo0x3xeTt1KupImFTxzvVkNZcDLuV21mMr58kOC8dy0zskSNmSCktNtkBWw/exec';
+        
         document.addEventListener('DOMContentLoaded', function() {
             // Configurar fecha y hora actual
             const now = new Date();
@@ -1924,30 +1904,30 @@ function enviarFormulario2(e) {
                         <div id="kit_higiene_personal_${resource.count}" class="conditional-question hidden">
                             <div class="form-group">
                                 <label class="required">Kit de Higiene Personal:</label>
-                                <div class="checkbox-group"> <!-- CAMBIADO: radio-group → checkbox-group -->
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                <div class="checkbox-group">
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_higiene_personal_${resource.count}[]" value="Kit Higiene Hombre">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Kit Higiene Hombre</span>
                                     </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_higiene_personal_${resource.count}[]" value="Kit Higiene Mujer">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Kit Higiene Mujer</span>
                                     </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_higiene_personal_${resource.count}[]" value="Kit Higiene Infantil">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Kit Higiene Infantil</span>
                                     </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_higiene_personal_${resource.count}[]" value="Kit Higiene Lactante">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Kit Higiene Lactante</span>
                                     </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_higiene_personal_${resource.count}[]" value="other"> 
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Otro</span>
                                     </label>
                                 </div>
@@ -1960,25 +1940,25 @@ function enviarFormulario2(e) {
                         <div id="kit_alimentacion_suplementos_${resource.count}" class="conditional-question hidden">
                             <div class="form-group">
                                 <label class="required">Kit de Alimentación y Suplementos:</label>
-                                <div class="checkbox-group"> <!-- CAMBIADO: radio-group → checkbox-group -->
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                <div class="checkbox-group">
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_alimentacion_suplementos_${resource.count}[]" value="Kit de Alimentación 4 Pers.- 4 días">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Kit de Alimentación 4 Pers.- 4 días</span>
                                     </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_alimentacion_suplementos_${resource.count}[]" value="Kit Alimentos 4 Pers. - 7 días">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Kit Alimentos 4 Pers. - 7 días</span>
                                     </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_alimentacion_suplementos_${resource.count}[]" value="Kit Alimentos Mascotas">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Kit Alimentos Mascotas</span>
                                     </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_alimentacion_suplementos_${resource.count}[]" value="other"> 
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Otro</span>
                                     </label>
                                 </div>
@@ -2103,7 +2083,7 @@ function enviarFormulario2(e) {
                                 <label class="radio-option">
                                     <input type="radio" name="tiempo_disponibilidad_herramienta_${resource.count}" value="Superior a 48 hrs">
                                     <span class="custom-radio"></span>
-                                    <span class="option-text">Superior a 48 hrs</span>
+                                    <span class="option-text">Superior to 48 hrs</span>
                                 </label>
                                 <label class="radio-option">
                                     <input type="radio" name="tiempo_disponibilidad_herramienta_${resource.count}" value="otro">
@@ -2408,56 +2388,68 @@ function enviarFormulario2(e) {
                 }
             }
             
-            document.getElementById('main-form').addEventListener('submit', function(e) {
+            // Función para enviar el formulario a Google Sheets
+            document.getElementById('main-form').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
-                if (this.checkValidity()) {
-                    document.getElementById('form-container').style.display = 'none';
-                    document.getElementById('thank-you').style.display = 'block';
-                } else {
+                if (!this.checkValidity()) {
                     alert('Por favor complete todos los campos requeridos.');
+                    return;
+                }
+                
+                // Mostrar mensaje de carga
+                document.getElementById('form-loading').style.display = 'block';
+                document.getElementById('form-success').style.display = 'none';
+                document.getElementById('form-error').style.display = 'none';
+                
+                try {
+                    // Recopilar todos los datos del formulario
+                    const formData = new FormData(this);
+                    
+                    // Agregar información sobre recursos
+                    formData.append('num_transporte', resources.transporte.count);
+                    formData.append('num_humanos', resources.humanos.count);
+                    formData.append('num_herramientas', resources.herramientas.count);
+                    
+                    // Enviar datos a Google Apps Script
+                    const response = await fetch(scriptURL, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (response.ok) {
+                        // Mostrar mensaje de éxito
+                        document.getElementById('form-loading').style.display = 'none';
+                        document.getElementById('form-success').style.display = 'block';
+                        
+                        // Limpiar formulario después de 3 segundos
+                        setTimeout(() => {
+                            this.reset();
+                            document.getElementById('form-success').style.display = 'none';
+                            
+                            // Limpiar recursos
+                            ['transporte', 'humanos', 'herramientas'].forEach(type => {
+                                resources[type].count = 0;
+                                resources[type].current = 0;
+                                resources[type].container.innerHTML = '';
+                                updateCounter(type);
+                            });
+                        }, 3000);
+                    } else {
+                        throw new Error('Error en la respuesta del servidor');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    document.getElementById('form-loading').style.display = 'none';
+                    document.getElementById('form-error').style.display = 'block';
+                    
+                    // Ocultar mensaje de error después de 5 segundos
+                    setTimeout(() => {
+                        document.getElementById('form-error').style.display = 'none';
+                    }, 5000);
                 }
             });
         });
     </script>
-    <script>
-function enviarFormulario(event) {
-  event.preventDefault();
-  const form = document.getElementById('main-form');
-  const formData = new FormData(form);
-
-  fetch(form.action, {
-    method: 'POST',
-    body: formData,
-    headers: {
-      'Accept': 'application/json'
-    }
-  })
-  .then(response => response.json())
-  .then(data => {
-    if(data.result === "success") {
-      alert(data.message);
-      form.reset();
-    } else {
-      alert("Error: " + data.message);
-    }
-  })
-  .catch(error => {
-    alert("Error al enviar el formulario: " + error.message);
-  });
-
-  return false;
-}
-
-</script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
