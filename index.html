@@ -3,8 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://unpkg.com https://script.google.com; connect-src 'self' https://script.google.com https://script.googleusercontent.com;">
-    
     <title>Levantamiento de Recursos y Capacidades Comunales</title>
     <!-- Agregar Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
@@ -674,6 +672,44 @@
         }
     </style>
 </head>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('mi_formulario'); // Usa el id de tu formulario
+  if (form) {
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+      const formData = {};
+      new FormData(form).forEach((value, key) => { formData[key] = value; });
+
+      // Ajusta estos valores según el tipo de info a guardar
+      let resourceType = formData.resourceType || 'transporte'; // Modifica según lógica en tu app
+      let isBasicInfo = formData.isBasicInfo === 'on' || false;
+      let timestamp = new Date().toISOString();
+
+      fetch('WEBAPP_URL', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          formData, resourceType, isBasicInfo, timestamp
+        }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.result === 'success') {
+          alert('¡Respuesta enviada correctamente!');
+          form.reset();
+        } else {
+          alert('Hubo un error: ' + data.message);
+        }
+      })
+      .catch(error => {
+        alert('Error en la comunicación: ' + error.message);
+      });
+    });
+  }
+});
+</script>
+
 <body>
     <!-- Banner superior -->
     <div class="banner">
@@ -2389,7 +2425,7 @@
         /// Función para enviar datos a Google Apps Script
 function submitToGoogleSheets(formData, resourceType, isBasicInfo = false) {
     // URL CORRECTA de tu Google Apps Script (¡ACTUALIZA ESTA URL!)
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyMCbirNiiPJB5aIJOwqSWpEpWFe0t8zcEQwB20KEjUYG6fmQBA_bdrSYjH1sGkVC39tQ/exec';
+    const scriptURL = 'https://script.google.com/macros/s/TU_ID_VERDADERO/exec';
     
     console.log('Enviando datos a:', scriptURL);
     
@@ -2475,7 +2511,4 @@ document.getElementById('main-form').addEventListener('submit', function(e) {
       });
     </script>
 </body>
-
 </html>
-
-
