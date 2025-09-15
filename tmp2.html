@@ -670,6 +670,32 @@
             border-radius: 6px;
             border-left: 4px solid #3498db;
         }
+
+        /* Estilos para mensajes de estado */
+        .form-message {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .form-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .form-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .form-loading {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
     </style>
 </head>
 <body>
@@ -677,7 +703,19 @@
     <div class="banner">
         <img src="https://raw.githubusercontent.com/mariana-navarro/imagenes/refs/heads/main/hub%20los%20rios/SIGER%20(2).png" alt="Logo Municipalidad">
     </div>
-
+    
+    <!-- Mensajes de estado -->
+    <div id="form-success" class="form-message form-success" style="display: none;">
+        ¡Formulario enviado con éxito! Los datos han sido guardados correctamente.
+    </div>
+    
+    <div id="form-error" class="form-message form-error" style="display: none;">
+        <span id="error-message">Ha ocurrido un error al enviar el formulario. Por favor, inténtelo de nuevo.</span>
+    </div>
+    
+    <div id="form-loading" class="form-message form-loading" style="display: none;">
+        Enviando datos, por favor espere...
+    </div>
     <div class="container">
         <div id="form-container">
             <div class="form-header-banner">
@@ -1019,11 +1057,18 @@
                            lat >= -90 && lat <= 90 && 
                            lng >= -180 && lng <= 180;
                 }
+
+                // En la función initMap, después de crear los inputs de coordenadas
+                function updateHiddenCoords(lat, lng, resourceId) {
+                    document.getElementById(`latitud_${resourceId}`).value = lat;
+                    document.getElementById(`longitud_${resourceId}`).value = lng;
+                }
                 
                 // Actualizar coordenadas cuando se mueve el marcador
                 marker.on('dragend', function(e) {
                     const { lat, lng } = e.target.getLatLng();
                     updateCoordinates(lat, lng);
+                    updateHiddenCoords(lat, lng, resourceId); 
                     
                     // Hacer geocodificación inversa para obtener la dirección
                     geocoder.reverse(e.latlng, map.options.crs.scale(map.getZoom()), function(results) {
@@ -1042,6 +1087,7 @@
                     const { lat, lng } = e.latlng;
                     marker.setLatLng([lat, lng]);
                     updateCoordinates(lat, lng);
+                    updateHiddenCoords(lat, lng, resourceId); 
                     
                     // Hacer geocodificación inversa para obtener la dirección
                     geocoder.reverse(e.latlng, map.options.crs.scale(map.getZoom()), function(results) {
@@ -1083,11 +1129,6 @@
                         updateCoordinates(marker.getLatLng().lat, marker.getLatLng().lng);
                     }
                 });
-
-                function updateHiddenCoords(lat, lng, resourceType, resourceId) {
-                    document.getElementById(`latitud_${resourceId}`).value = lat;
-                    document.getElementById(`longitud_${resourceId}`).value = lng;
-                }
                 
                 return {
                     map: map,
@@ -2397,95 +2438,113 @@
                 }
             });
         });
+// URL de tu Web App de Google Apps Script (¡ACTUALIZA ESTA URL!)
+const scriptURL = 'https://script.google.com/macros/s/AKfycbwoDRRl2lQrpqq0EhQyQJRVF7KQ9Rbla4Bmvg6MwTDeenXg3HDZHUh4anV97XpiAuUezw/exec';
 
-        /// Función para enviar datos a Google Apps Script
-function submitToGoogleSheets(formData, resourceType, isBasicInfo = false) {
-    // URL CORRECTA de tu Google Apps Script (¡ACTUALIZA ESTA URL!)
-    const scriptURL = 'https://script.google.com/macros/s/TU_ID_VERDADERO/exec';
-    
-    console.log('Enviando datos a:', scriptURL);
-    
-    return fetch(scriptURL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            formData: formData,
-            resourceType: resourceType,
-            isBasicInfo: isBasicInfo,
-            timestamp: new Date().toISOString()
-        })
-    })
-    .then(response => {
-        console.log('Respuesta recibida, status:', response.status);
-        if (!response.ok) {
-            throw new Error(`Error HTTP: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Datos de respuesta:', data);
-        if (data.result === 'error') {
-            throw new Error(data.message || 'Error del servidor');
-        }
-        return data;
-    });
-}
-
-// Modificar el evento submit del formulario para mejor manejo de errores
-document.getElementById('main-form').addEventListener('submit', function(e) {
+document.getElementById('main-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     
-    const submitBtn = this.querySelector('.submit-btn');
+    if (!this.checkValidity()) {
+        alert('Por favor complete todos los campos requeridos.');
+        return;
+    }
+    
+    // Mostrar mensaje de carga
+    document.getElementById('form-loading').style.display = 'block';
+    document.getElementById('form-success').style.display = 'none';
+    document.getElementById('form-error').style.display = 'none';
+    
+    // Deshabilitar el botón de enviar
+    const submitBtn = this.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
     submitBtn.textContent = 'Enviando...';
     submitBtn.disabled = true;
     
-    if (this.checkValidity()) {
-        // Obtener datos básicos
+    try {
+        // Recopilar todos los datos del formulario
         const formData = new FormData(this);
-        const basicData = {};
+        
+        // Agregar información sobre recursos
+        formData.append('num_transporte', resources.transporte.count);
+        formData.append('num_humanos', resources.humanos.count);
+        formData.append('num_herramientas', resources.herramientas.count);
+        
+        // Convertir FormData a objeto simple
+        const data = {};
         for (let [key, value] of formData.entries()) {
-            if (!key.includes('_transporte_') && 
-                !key.includes('_humanos_') && 
-                !key.includes('_herramientas_')) {
-                basicData[key] = value;
+            // Para checkboxes y campos múltiples
+            if (data[key] !== undefined) {
+                if (!Array.isArray(data[key])) {
+                    data[key] = [data[key]];
+                }
+                data[key].push(value);
+            } else {
+                data[key] = value;
             }
         }
         
-              // Enviar información básica
-              submitToGoogleSheets(basicData, 'informacion_basica', true)
-                  .then(() => {
-                      // Obtener tipo de recurso seleccionado
-                      const resourceType = document.getElementById('tipo_recurso').value;
-                      
-                      // Procesar recursos según el tipo
-                      if (resourceType === 'Medios de Transporte' && resources.transporte.count > 0) {
-                          // Tu lógica para procesar recursos de transporte
-                          console.log('Procesando recursos de transporte...');
-                      }
-                      // ... similar para humanos y herramientas
-                      
-                      // Mostrar mensaje de éxito
-                      document.getElementById('form-container').style.display = 'none';
-                      document.getElementById('thank-you').style.display = 'block';
-                  })
-                  .catch(error => {
-                      console.error('Error al enviar:', error);
-                      alert('Error: ' + error.message + '\nRevisa la consola (F12) para más detalles.');
-                  })
-                  .finally(() => {
-                      submitBtn.textContent = originalText;
-                      submitBtn.disabled = false;
-                  });
-          } else {
-              alert('Por favor complete todos los campos requeridos.');
-              submitBtn.textContent = originalText;
-              submitBtn.disabled = false;
-          }
-      });
+        console.log('Datos a enviar:', data);
+        
+        // Enviar datos a Google Apps Script
+        const response = await fetch(scriptURL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        console.log('Respuesta del servidor:', result);
+        
+        if (response.ok && result.result === 'success') {
+            // Mostrar mensaje de éxito
+            document.getElementById('form-loading').style.display = 'none';
+            document.getElementById('form-success').style.display = 'block';
+            
+            // Limpiar formulario después de 3 segundos
+            setTimeout(() => {
+                this.reset();
+                document.getElementById('form-success').style.display = 'none';
+                
+                // Limpiar recursos
+                ['transporte', 'humanos', 'herramientas'].forEach(type => {
+                    resources[type].count = 0;
+                    resources[type].current = 0;
+                    resources[type].container.innerHTML = '';
+                    updateCounter(type);
+                });
+                
+                // Rehabilitar botón
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }, 3000);
+        } else {
+            throw new Error(result.error || 'Error en la respuesta del servidor');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('form-loading').style.display = 'none';
+        document.getElementById('form-error').style.display = 'block';
+        
+        // Mostrar error específico
+        const errorElement = document.getElementById('error-message');
+        if (errorElement) {
+            errorElement.textContent = error.toString();
+        }
+        
+        // Rehabilitar botón
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+        
+        // Ocultar mensaje de error después de 8 segundos
+        setTimeout(() => {
+            document.getElementById('form-error').style.display = 'none';
+        }, 8000);
+    }
+});
     </script>
 </body>
 
 </html>
+
