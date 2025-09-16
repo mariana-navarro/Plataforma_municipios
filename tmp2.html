@@ -711,7 +711,7 @@
             </div>
 
             <!-- MODIFICADO: Agregado action y method -->
-            <form id="main-form" action="https://script.google.com/macros/s/AKfycbwoDRRl2lQrpqq0EhQyQJRVF7KQ9Rbla4Bmvg6MwTDeenXg3HDZHUh4anV97XpiAuUezw/exec" method="POST">
+            <form id="main-form">
                 <!-- Sección de Información Básica -->
                 <div class="form-section">
                     <h2>Información Básica</h2>
@@ -2402,24 +2402,61 @@
                 }
             }
             
-            // MODIFICADO: Función para enviar el formulario
             document.getElementById('main-form').addEventListener('submit', function(e) {
                 e.preventDefault();
                 
                 if (this.checkValidity()) {
+                    // Mostrar mensaje de carga
+                    document.getElementById('form-container').style.display = 'none';
+                    document.getElementById('thank-you').style.display = 'block';
+                    
+                    // Recopilar todos los datos del formulario
+                    const formData = new FormData(this);
+                    
                     // Agregar campos ocultos con el número de recursos
                     const tipoRecurso = document.getElementById('tipo_recurso').value;
                     
                     if (tipoRecurso === 'Medios de Transporte') {
-                        addHiddenField('num_transporte', resources.transporte.count);
+                        formData.append('num_transporte', resources.transporte.count);
                     } else if (tipoRecurso === 'Recursos Humanos') {
-                        addHiddenField('num_humanos', resources.humanos.count);
+                        formData.append('num_humanos', resources.humanos.count);
                     } else if (tipoRecurso === 'Herramientas o Elementos Auxiliares') {
-                        addHiddenField('num_herramientas', resources.herramientas.count);
+                        formData.append('num_herramientas', resources.herramientas.count);
                     }
                     
-                    // Enviar formulario
-                    this.submit();
+                    // Convertir FormData a objeto simple
+                    const data = {};
+                    for (let [key, value] of formData.entries()) {
+                        if (data[key]) {
+                            // Si la clave ya existe, convertir a array
+                            if (!Array.isArray(data[key])) {
+                                data[key] = [data[key]];
+                            }
+                            data[key].push(value);
+                        } else {
+                            data[key] = value;
+                        }
+                    }
+                    
+                    // Enviar datos a Google Apps Script usando fetch
+                    fetch('https://script.google.com/macros/s/AKfycbwoDRRl2lQrpqq0EhQyQJRVF7KQ9Rbla4Bmvg6MwTDeenXg3HDZHUh4anV97XpiAuUezw/exec', {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(response => {
+                        console.log('Datos enviados exitosamente');
+                        // Ya mostramos el mensaje de agradecimiento antes de enviar
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Hubo un error al enviar el formulario. Por favor, inténtelo de nuevo.');
+                        document.getElementById('form-container').style.display = 'block';
+                        document.getElementById('thank-you').style.display = 'none';
+                    });
                 } else {
                     alert('Por favor complete todos los campos requeridos.');
                 }
@@ -2437,3 +2474,4 @@
     </script>
 </body>
 </html>
+
