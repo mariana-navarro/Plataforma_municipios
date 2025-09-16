@@ -696,6 +696,24 @@
             color: #0c5460;
             border: 1px solid #bee5eb;
         }
+        loading, #error-message {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        loading {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
     </style>
 </head>
 <body>
@@ -2414,56 +2432,104 @@
                 e.preventDefault();
                 
                 if (this.checkValidity()) {
-                    // Mostrar mensaje de carga
+                    // Mostrar mensaje de carga y ocultar formulario
                     document.getElementById('form-container').style.display = 'none';
                     document.getElementById('thank-you').style.display = 'block';
+                    document.getElementById('loading').style.display = 'block';
+                    document.getElementById('error-message').style.display = 'none';
                     
-                    // Recopilar todos los datos del formulario
-                    const formData = new FormData(this);
+                    // Recopilar todos los datos del formulario manualmente
+                    const data = {};
                     
-                    // Agregar campos ocultos con el número de recursos
-                    const tipoRecurso = document.getElementById('tipo_recurso').value;
+                    // Agregar campos básicos
+                    const basicFields = [
+                        'region', 'fecha_hora', 'rut', 'doc', 'comuna', 
+                        'nombre', 'cargo', 'telefono', 'email', 'tipo_recurso'
+                    ];
+                    
+                    basicFields.forEach(field => {
+                        const element = document.querySelector(`[name="${field}"]`);
+                        if (element) data[field] = element.value;
+                    });
+                    
+                    // Agregar campos según el tipo de recurso
+                    const tipoRecurso = data.tipo_recurso;
+                    let resourceType = '';
+                    let resourceCount = 0;
                     
                     if (tipoRecurso === 'Medios de Transporte') {
-                        formData.append('num_transporte', resources.transporte.count);
+                        resourceType = 'transporte';
+                        resourceCount = resources.transporte.count;
+                        data.num_transporte = resourceCount;
                     } else if (tipoRecurso === 'Recursos Humanos') {
-                        formData.append('num_humanos', resources.humanos.count);
+                        resourceType = 'humano';
+                        resourceCount = resources.humanos.count;
+                        data.num_humanos = resourceCount;
                     } else if (tipoRecurso === 'Herramientas o Elementos Auxiliares') {
-                        formData.append('num_herramientas', resources.herramientas.count);
+                        resourceType = 'herramienta';
+                        resourceCount = resources.herramientas.count;
+                        data.num_herramientas = resourceCount;
                     }
                     
-                    // Convertir FormData a objeto simple
-                    const data = {};
-                    for (let [key, value] of formData.entries()) {
-                        if (data[key]) {
-                            // Si la clave ya existe, convertir a array
-                            if (!Array.isArray(data[key])) {
-                                data[key] = [data[key]];
+                    // Agregar datos de cada recurso
+                    for (let i = 1; i <= resourceCount; i++) {
+                        // Obtener todos los campos para este recurso
+                        const resourceFields = document.querySelectorAll(`[name$="_${i}"]`);
+                        
+                        resourceFields.forEach(field => {
+                            const fieldName = field.name;
+                            
+                            if (field.type === 'checkbox') {
+                                // Manejar checkboxes
+                                if (field.checked) {
+                                    if (!data[fieldName]) {
+                                        data[fieldName] = field.value;
+                                    } else if (Array.isArray(data[fieldName])) {
+                                        data[fieldName].push(field.value);
+                                    } else {
+                                        data[fieldName] = [data[fieldName], field.value];
+                                    }
+                                }
+                            } else if (field.type === 'radio') {
+                                // Manejar radios (solo el seleccionado)
+                                if (field.checked) {
+                                    data[fieldName] = field.value;
+                                }
+                            } else {
+                                // Manejar otros tipos de campos
+                                data[fieldName] = field.value;
                             }
-                            data[key].push(value);
-                        } else {
-                            data[key] = value;
-                        }
+                        });
                     }
+                    
+                    console.log('Datos a enviar:', data);
                     
                     // Enviar datos a Google Apps Script usando fetch
                     fetch('https://script.google.com/macros/s/AKfycbwoDRRl2lQrpqq0EhQyQJRVF7KQ9Rbla4Bmvg6MwTDeenXg3HDZHUh4anV97XpiAuUezw/exec', {
                         method: 'POST',
-                        mode: 'no-cors',
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/x-www-form-urlencoded'
                         },
-                        body: JSON.stringify(data)
+                        body: new URLSearchParams(data).toString()
                     })
                     .then(response => {
-                        console.log('Datos enviados exitosamente');
-                        // Ya mostramos el mensaje de agradecimiento antes de enviar
+                        if (!response.ok) {
+                            throw new Error('Error en la respuesta del servidor');
+                        }
+                        return response.text();
+                    })
+                    .then(result => {
+                        console.log('Éxito:', result);
+                        document.getElementById('loading').style.display = 'none';
+                        // El mensaje de agradecimiento ya está visible
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Hubo un error al enviar el formulario. Por favor, inténtelo de nuevo.');
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('error-message').style.display = 'block';
                         document.getElementById('form-container').style.display = 'block';
                         document.getElementById('thank-you').style.display = 'none';
+                        alert('Hubo un error al enviar el formulario: ' + error.message);
                     });
                 } else {
                     alert('Por favor complete todos los campos requeridos.');
@@ -2482,5 +2548,6 @@
     </script>
 </body>
 </html>
+
 
 
