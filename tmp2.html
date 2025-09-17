@@ -2482,111 +2482,156 @@
         }
             
         document.getElementById('main-form').addEventListener('submit', function(e) {
-        e.preventDefault();
+    e.preventDefault();
+    
+    if (this.checkValidity()) {
+        // Mostrar mensaje de carga
+        showMessage('loading');
+        document.getElementById('form-container').style.display = 'none';
         
-        if (this.checkValidity()) {
-            // Mostrar mensaje de carga y ocultar formulario
-            document.getElementById('form-container').style.display = 'none';
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('error-message').style.display = 'none';
-            document.getElementById('thank-you').style.display = 'none';
+        // Recopilar todos los datos del formulario
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+        
+        // Agregar campos según el tipo de recurso
+        const tipoRecurso = data.tipo_recurso;
+        let resourceCount = 0;
+        
+        if (tipoRecurso === 'Medios de Transporte') {
+            resourceCount = resources.transporte.count;
+            data.num_transporte = resourceCount;
+        } else if (tipoRecurso === 'Recursos Humanos') {
+            resourceCount = resources.humanos.count;
+            data.num_humanos = resourceCount;
+        } else if (tipoRecurso === 'Herramientas o Elementos Auxiliares') {
+            resourceCount = resources.herramientas.count;
+            data.num_herramientas = resourceCount;
+        }
+        
+        // Agregar datos de cada recurso
+        for (let i = 1; i <= resourceCount; i++) {
+            // Obtener todos los campos para este recurso
+            const resourceFields = document.querySelectorAll(`[name$="_${i}"]`);
             
-            // Recopilar todos los datos del formulario
-            const formData = new FormData(this);
-            const data = Object.fromEntries(formData.entries());
-            
-            // Agregar campos según el tipo de recurso
-            const tipoRecurso = data.tipo_recurso;
-            let resourceCount = 0;
-            
-            if (tipoRecurso === 'Medios de Transporte') {
-                resourceCount = resources.transporte.count;
-                data.num_transporte = resourceCount;
-            } else if (tipoRecurso === 'Recursos Humanos') {
-                resourceCount = resources.humanos.count;
-                data.num_humanos = resourceCount;
-            } else if (tipoRecurso === 'Herramientas o Elementos Auxiliares') {
-                resourceCount = resources.herramientas.count;
-                data.num_herramientas = resourceCount;
-            }
-            
-            // Agregar datos de cada recurso
-            for (let i = 1; i <= resourceCount; i++) {
-                // Obtener todos los campos para este recurso
-                const resourceFields = document.querySelectorAll(`[name$="_${i}"]`);
+            resourceFields.forEach(field => {
+                const fieldName = field.name;
                 
-                resourceFields.forEach(field => {
-                    const fieldName = field.name;
-                    
-                    if (field.type === 'checkbox') {
-                        // Manejar checkboxes - solo agregar si están checked
-                        if (field.checked) {
-                            if (!data[fieldName]) {
-                                data[fieldName] = field.value;
-                            } else if (Array.isArray(data[fieldName])) {
-                                data[fieldName].push(field.value);
-                            } else {
-                                data[fieldName] = [data[fieldName], field.value];
-                            }
-                        }
-                    } else if (field.type === 'radio') {
-                        // Manejar radios - solo agregar si están checked
-                        if (field.checked) {
+                if (field.type === 'checkbox') {
+                    // Solo agregar checkboxes si están marcados
+                    if (field.checked) {
+                        if (!data[fieldName]) {
                             data[fieldName] = field.value;
+                        } else if (Array.isArray(data[fieldName])) {
+                            data[fieldName].push(field.value);
+                        } else {
+                            data[fieldName] = [data[fieldName], field.value];
                         }
-                    } else {
-                        // Manejar otros tipos de campos
+                    }
+                } else if (field.type === 'radio') {
+                    // Solo agregar radios si están seleccionados
+                    if (field.checked) {
                         data[fieldName] = field.value;
                     }
+                } else {
+                    // Manejar otros tipos de campos
+                    data[fieldName] = field.value;
+                }
+            });
+        }
+        
+        console.log('Datos a enviar:', data);
+        
+        // Enviar datos a Google Apps Script
+        fetch('https://script.google.com/macros/s/AKfycbwoDRRl2lQrpqq0EhQyQJRVF7KQ9Rbla4Bmvg6MwTDeenXg3HDZHUh4anV97XpiAuUezw/exec', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            // Google Apps Script hace redirecciones, manejarlas adecuadamente
+            if (response.redirected) {
+                return fetch(response.url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
                 });
             }
+            return response;
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(result => {
+            console.log('Éxito:', result);
             
-            console.log('Datos a enviar:', data);
+            if (result.result === 'success') {
+                showMessage('thank-you');
+            } else {
+                throw new Error(result.error || 'Error desconocido del servidor');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('error-message');
+            document.getElementById('form-container').style.display = 'block';
             
-            // Enviar datos a Google Apps Script usando fetch
-            fetch('https://script.google.com/macros/s/AKfycbwXIEzf5VNcubDCmylCfZMIFZqUYxBBgVi8Mnp0K1vmyup49q8_AeidXcDWfZU-JlyRug/exec', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error en la respuesta del servidor');
-                }
-                return response.json();
-            })
-            .then(result => {
-                console.log('Éxito:', result);
-                document.getElementById('loading').style.display = 'none';
-                
-                if (result.result === 'success') {
-                    document.getElementById('thank-you').style.display = 'block';
-                } else {
-                    throw new Error(result.error || 'Error desconocido');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('error-message').style.display = 'block';
-                document.getElementById('form-container').style.display = 'block';
-                document.getElementById('thank-you').style.display = 'none';
-                
-                // Mostrar mensaje de error específico
-                const errorElement = document.getElementById('error-message');
-                errorElement.innerHTML = `<p>Hubo un error al enviar el formulario: ${error.message}</p>
-                                         <p>Por favor, inténtelo de nuevo.</p>`;
-            });
-        } else {
-            alert('Por favor complete todos los campos requeridos.');
-        }
-    });
+            // Mostrar mensaje de error específico
+            const errorElement = document.getElementById('error-message');
+            errorElement.innerHTML = `<p>Hubo un error al enviar el formulario: ${error.message}</p>
+                                     <p>Por favor, inténtelo de nuevo.</p>
+                                     <button onclick="testConnection()">Probar Conexión</button>`;
+        });
+    } else {
+        alert('Por favor complete todos los campos requeridos.');
+    }
 });
+});
+
+        // Función para probar la conexión con Google Apps Script
+function testConnection() {
+    console.log('Probando conexión con Google Apps Script...');
+    document.getElementById('loading').style.display = 'block';
+    
+    fetch('https://script.google.com/macros/s/AKfycbwoDRRl2lQrpqq0EhQyQJRVF7KQ9Rbla4Bmvg6MwTDeenXg3HDZHUh4anV97XpiAuUezw/exec?test=1')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Prueba de conexión exitosa:', data);
+            document.getElementById('loading').style.display = 'none';
+            alert('Conexión exitosa: ' + data.message);
+        })
+        .catch(error => {
+            console.error('Error de conexión:', error);
+            document.getElementById('loading').style.display = 'none';
+            alert('Error de conexión: ' + error.message);
+        });
+}
+
+// Función para mostrar/ocultar mensajes
+function showMessage(messageId) {
+    // Ocultar todos los mensajes
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error-message').style.display = 'none';
+    document.getElementById('thank-you').style.display = 'none';
+    
+    // Mostrar el mensaje solicitado
+    if (messageId) {
+        document.getElementById(messageId).style.display = 'block';
+    }
+}
 </script>
+    <button onclick="testConnection()" style="position: fixed; bottom: 10px; right: 10px; z-index: 1000; padding: 10px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        Probar Conexión
+    </button>
 </body>
 </html>
+
 
 
 
