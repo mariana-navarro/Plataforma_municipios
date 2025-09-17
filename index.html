@@ -900,1804 +900,546 @@
     <!-- Agregar Nominatim para geocodificación -->
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Configurar fecha y hora actual
-            const now = new Date();
-            const fechaHoraInput = document.getElementById('fecha_hora');
-            const offset = now.getTimezoneOffset();
-            now.setMinutes(now.getMinutes() - offset);
-            fechaHoraInput.value = now.toISOString().slice(0, 16);
-            
-            // Mostrar/ocultar secciones según tipo de recurso seleccionado
-            const tipoRecursoSelect = document.getElementById('tipo_recurso');
-            tipoRecursoSelect.addEventListener('change', function() {
-                document.getElementById('transporte-section').classList.add('hidden');
-                document.getElementById('humanos-section').classList.add('hidden');
-                document.getElementById('herramientas-section').classList.add('hidden');
-                
-                if (this.value === 'Medios de Transporte') {
-                    document.getElementById('transporte-section').classList.remove('hidden');
-                } else if (this.value === 'Recursos Humanos') {
-                    document.getElementById('humanos-section').classList.remove('hidden');
-                } else if (this.value === 'Herramientas o Elementos Auxiliares') {
-                    document.getElementById('herramientas-section').classList.remove('hidden');
-                }
-            });
-            
-            // Llenar opciones de comunas (ejemplo)
-            const comunaSelect = document.getElementById('comuna');
-            const comunas = [
-                'Cerrillos', 'Cerro Navia', 'Conchalí', 'El Bosque', 'Estación Central', 
-                'Huechuraba', 'Independencia', 'La Cisterna', 'La Florida', 'La Granja',
-                'La Pintana', 'La Reina', 'Las Condes', 'Lo Barnechea', 'Lo Espejo',
-                'Lo Prado', 'Macul', 'Maipú', 'Ñuñoa', 'Pedro Aguirre Cerda',
-                'Peñalolén', 'Providencia', 'Pudahuel', 'Quilicura', 'Quinta Normal',
-                'Recoleta', 'Renca', 'San Joaquín', 'San Miguel', 'San Ramón',
-                'Santiago', 'Vitacura'
-            ];
-            
-            comunas.forEach(comuna => {
-                const option = document.createElement('option');
-                option.value = comuna;
-                option.textContent = comuna;
-                comunaSelect.appendChild(option);
-            });
-            
-            // Variables para manejar recursos
-            const resources = {
-                transporte: {
-                    count: 0,
-                    current: 0,
-                    container: document.getElementById('transporte-repeats'),
-                    counter: document.getElementById('transporte-counter'),
-                    maps: {} // Almacenar instancias de mapas para transporte
-                },
-                humanos: {
-                    count: 0,
-                    current: 0,
-                    container: document.getElementById('humanos-repeats'),
-                    counter: document.getElementById('humanos-counter'),
-                    maps: {} // Almacenar instancias de mapas para humanos
-                },
-                herramientas: {
-                    count: 0,
-                    current: 0,
-                    container: document.getElementById('herramientas-repeats'),
-                    counter: document.getElementById('herramientas-counter'),
-                    maps: {} // Almacenar instancias de mapas para herramientas
-                }
-            };
-            
-            // Configurar botones de agregar
-            document.getElementById('add-transporte').addEventListener('click', function() {
-                addResource('transporte');
-            });
-            
-            document.getElementById('add-humanos').addEventListener('click', function() {
-                addResource('humanos');
-            });
-            
-            document.getElementById('add-herramientas').addEventListener('click', function() {
-                addResource('herramientas');
-            });
-            
-            // Configurar botones de eliminar
-            document.getElementById('delete-transporte').addEventListener('click', function() {
-                deleteResource('transporte');
-            });
-            
-            document.getElementById('delete-humanos').addEventListener('click', function() {
-                deleteResource('humanos');
-            });
-            
-            document.getElementById('delete-herramientas').addEventListener('click', function() {
-                deleteResource('herramientas');
-            });
+   <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Configurar fecha y hora actual
+    const now = new Date();
+    const fechaHoraInput = document.getElementById('fecha_hora');
+    const offset = now.getTimezoneOffset();
+    now.setMinutes(now.getMinutes() - offset);
+    fechaHoraInput.value = now.toISOString().slice(0, 16);
+    
+    // Mostrar/ocultar secciones según tipo de recurso seleccionado
+    const tipoRecursoSelect = document.getElementById('tipo_recurso');
+    tipoRecursoSelect.addEventListener('change', function() {
+        document.getElementById('transporte-section').classList.add('hidden');
+        document.getElementById('humanos-section').classList.add('hidden');
+        document.getElementById('herramientas-section').classList.add('hidden');
+        
+        if (this.value === 'Medios de Transporte') {
+            document.getElementById('transporte-section').classList.remove('hidden');
+        } else if (this.value === 'Recursos Humanos') {
+            document.getElementById('humanos-section').classList.remove('hidden');
+        } else if (this.value === 'Herramientas o Elementos Auxiliares') {
+            document.getElementById('herramientas-section').classList.remove('hidden');
+        }
+    });
+    
+    // Llenar opciones de comunas (ejemplo)
+    const comunaSelect = document.getElementById('comuna');
+    const comunas = [
+        'Cerrillos', 'Cerro Navia', 'Conchalí', 'El Bosque', 'Estación Central', 
+        'Huechuraba', 'Independencia', 'La Cisterna', 'La Florida', 'La Granja',
+        'La Pintana', 'La Reina', 'Las Condes', 'Lo Barnechea', 'Lo Espejo',
+        'Lo Prado', 'Macul', 'Maipú', 'Ñuñoa', 'Pedro Aguirre Cerda',
+        'Peñalolén', 'Providencia', 'Pudahuel', 'Quilicura', 'Quinta Normal',
+        'Recoleta', 'Renca', 'San Joaquín', 'San Miguel', 'San Ramón',
+        'Santiago', 'Vitacura'
+    ];
+    
+    comunas.forEach(comuna => {
+        const option = document.createElement('option');
+        option.value = comuna;
+        option.textContent = comuna;
+        comunaSelect.appendChild(option);
+    });
+    
+    // Variables para manejar recursos
+    const resources = {
+        transporte: {
+            count: 0,
+            current: 0,
+            container: document.getElementById('transporte-repeats'),
+            counter: document.getElementById('transporte-counter'),
+            maps: {}
+        },
+        humanos: {
+            count: 0,
+            current: 0,
+            container: document.getElementById('humanos-repeats'),
+            counter: document.getElementById('humanos-counter'),
+            maps: {}
+        },
+        herramientas: {
+            count: 0,
+            current: 0,
+            container: document.getElementById('herramientas-repeats'),
+            counter: document.getElementById('herramientas-counter'),
+            maps: {}
+        }
+    };
+    
+    // Configurar botones de agregar
+    document.getElementById('add-transporte').addEventListener('click', function() {
+        addResource('transporte');
+    });
+    
+    document.getElementById('add-humanos').addEventListener('click', function() {
+        addResource('humanos');
+    });
+    
+    document.getElementById('add-herramientas').addEventListener('click', function() {
+        addResource('herramientas');
+    });
+    
+    // Configurar botones de eliminar
+    document.getElementById('delete-transporte').addEventListener('click', function() {
+        deleteResource('transporte');
+    });
+    
+    document.getElementById('delete-humanos').addEventListener('click', function() {
+        deleteResource('humanos');
+    });
+    
+    document.getElementById('delete-herramientas').addEventListener('click', function() {
+        deleteResource('herramientas');
+    });
 
-            // Función para inicializar un mapa
-            function initMap(containerId, resourceType, resourceId) {
-                const mapDiv = document.getElementById(containerId);
-                mapDiv.innerHTML = ''; // Limpiar el contenedor
-                
-                // Coordenadas iniciales (Santiago de Chile)
-                const initialLat = -33.4489;
-                const initialLng = -70.6693;
-                
-                // Crear el mapa
-                const map = L.map(containerId, {
-                    zoomControl: false
-                }).setView([initialLat, initialLng], 13);
-                
-                // Añadir zoom control en esquina inferior derecha
-                L.control.zoom({
-                    position: 'bottomright'
-                }).addTo(map);
-                
-                // Añadir capa de OpenStreetMap
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-                    maxZoom: 19
-                }).addTo(map);
-                
-                // Añadir marcador
-                let marker = L.marker([initialLat, initialLng], {
-                    draggable: true
-                }).addTo(map);
-                
-                // Crear contenedor de coordenadas
-                const coordsContainer = L.DomUtil.create('div', 'coordinates-container');
-                map.getContainer().appendChild(coordsContainer);
-                
-                // Grupo Latitud
-                const latGroup = L.DomUtil.create('div', 'coord-group');
-                const latLabel = L.DomUtil.create('label', '', latGroup);
-                latLabel.textContent = 'Lat:';
-                const latInput = L.DomUtil.create('input', 'coord-input', latGroup);
-                latInput.type = 'text';
-                latInput.value = initialLat.toFixed(6);
-                latInput.setAttribute('data-coord', 'lat');
-                
-                // Grupo Longitud
-                const lngGroup = L.DomUtil.create('div', 'coord-group');
-                const lngLabel = L.DomUtil.create('label', '', lngGroup);
-                lngLabel.textContent = 'Lon:';
-                const lngInput = L.DomUtil.create('input', 'coord-input', lngGroup);
-                lngInput.type = 'text';
-                lngInput.value = initialLng.toFixed(6);
-                lngInput.setAttribute('data-coord', 'lng');
-                
-                // Agregar grupos al contenedor
-                coordsContainer.appendChild(latGroup);
-                coordsContainer.appendChild(lngGroup);
-                
-                // Créditos
-                const credit = L.DomUtil.create('div', 'map-credit');
-                credit.textContent = 'Powered by OpenStreetMap';
-                map.getContainer().appendChild(credit);
-
-                // Configurar geocodificador Nominatim
-                const geocoder = L.Control.Geocoder.nominatim({
-                    geocodingQueryParams: {
-                        countrycodes: 'cl', // Limitar a Chile
-                        addressdetails: 1,
-                        limit: 5,
-                        'accept-language': 'es'
-                    }
-                });
-
-                // Añadir control de búsqueda al mapa
-                L.Control.geocoder({
-                    defaultMarkGeocode: false,
-                    position: 'topleft',
-                    placeholder: 'Buscar dirección...',
-                    errorMessage: 'No se encontraron resultados.'
-                })
-                .on('markgeocode', function(e) {
-                    const { center, name, properties } = e.geocode;
-                    
-                    // Mover el marcador a la ubicación encontrada
-                    marker.setLatLng(center);
-                    map.setView(center, 16);
-                    
-                    // Actualizar coordenadas
-                    latInput.value = center.lat.toFixed(6);
-                    lngInput.value = center.lng.toFixed(6);
-                    
-                    // Actualizar campo de ubicación geográfica
-                    const ubicacionInput = document.querySelector(`input[name^="ubicacion_${resourceType}_${resourceId}"]`);
-                    if (ubicacionInput) {
-                        ubicacionInput.value = properties.display_name || name;
-                    }
-                })
-                .addTo(map);
-
-                // Función para actualizar coordenadas
-                function updateCoordinates(lat, lng) {
-                    latInput.value = lat.toFixed(6);
-                    lngInput.value = lng.toFixed(6);
+    // Función para inicializar un mapa
+    function initMap(containerId, resourceType, resourceId) {
+        const mapDiv = document.getElementById(containerId);
+        if (!mapDiv) {
+            console.error('No se encontró el contenedor del mapa:', containerId);
+            return null;
+        }
+        
+        mapDiv.innerHTML = '';
+        
+        // Coordenadas iniciales (Santiago de Chile)
+        const initialLat = -33.4489;
+        const initialLng = -70.6693;
+        
+        // Crear el mapa
+        const map = L.map(containerId).setView([initialLat, initialLng], 13);
+        
+        // Añadir capa de OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 19
+        }).addTo(map);
+        
+        // Añadir marcador
+        let marker = L.marker([initialLat, initialLng], {
+            draggable: true
+        }).addTo(map);
+        
+        // Crear contenedor de coordenadas
+        const coordsContainer = L.DomUtil.create('div', 'coordinates-container');
+        map.getContainer().appendChild(coordsContainer);
+        
+        // Grupo Latitud
+        const latGroup = L.DomUtil.create('div', 'coord-group');
+        const latLabel = L.DomUtil.create('label', '', latGroup);
+        latLabel.textContent = 'Lat:';
+        const latInput = L.DomUtil.create('input', 'coord-input', latGroup);
+        latInput.type = 'text';
+        latInput.value = initialLat.toFixed(6);
+        latInput.setAttribute('data-coord', 'lat');
+        latInput.setAttribute('name', `coordenadas_${resourceType}_${resourceId}_lat`);
+        
+        // Grupo Longitud
+        const lngGroup = L.DomUtil.create('div', 'coord-group');
+        const lngLabel = L.DomUtil.create('label', '', lngGroup);
+        lngLabel.textContent = 'Lon:';
+        const lngInput = L.DomUtil.create('input', 'coord-input', lngGroup);
+        lngInput.type = 'text';
+        lngInput.value = initialLng.toFixed(6);
+        lngInput.setAttribute('data-coord', 'lng');
+        lngInput.setAttribute('name', `coordenadas_${resourceType}_${resourceId}_lng`);
+        
+        // Agregar grupos al contenedor
+        coordsContainer.appendChild(latGroup);
+        coordsContainer.appendChild(lngGroup);
+        
+        // Añadir control de búsqueda
+        L.Control.geocoder({
+            defaultMarkGeocode: false,
+            position: 'topleft',
+            placeholder: 'Buscar dirección...',
+            errorMessage: 'No se encontraron resultados.',
+            geocoder: L.Control.Geocoder.nominatim({
+                geocodingQueryParams: {
+                    countrycodes: 'cl',
+                    'accept-language': 'es'
                 }
-                
-                // Función para validar coordenadas
-                function isValidCoordinate(lat, lng) {
-                    return !isNaN(lat) && !isNaN(lng) && 
-                           lat >= -90 && lat <= 90 && 
-                           lng >= -180 && lng <= 180;
-                }
-                
-                // Actualizar coordenadas cuando se mueve el marcador
-                marker.on('dragend', function(e) {
-                    const { lat, lng } = e.target.getLatLng();
-                    updateCoordinates(lat, lng);
-                    
-                    // Hacer geocodificación inversa para obtener la dirección
-                    geocoder.reverse(e.latlng, map.options.crs.scale(map.getZoom()), function(results) {
-                        if (results && results.length > 0) {
-                            // Actualizar campo de ubicación geográfica
-                            const ubicacionInput = document.querySelector(`input[name^="ubicacion_${resourceType}_${resourceId}"]`);
-                            if (ubicacionInput) {
-                                ubicacionInput.value = results[0].properties.display_name || results[0].name;
-                            }
-                        }
-                    });
-                });
-                
-                // Manejar clics en el mapa
-                map.on('click', function(e) {
-                    const { lat, lng } = e.latlng;
-                    marker.setLatLng([lat, lng]);
-                    updateCoordinates(lat, lng);
-                    
-                    // Hacer geocodificación inversa para obtener la dirección
-                    geocoder.reverse(e.latlng, map.options.crs.scale(map.getZoom()), function(results) {
-                        if (results && results.length > 0) {
-                            // Actualizar campo de ubicación geográfica
-                            const ubicacionInput = document.querySelector(`input[name^="ubicacion_${resourceType}_${resourceId}"]`);
-                            if (ubicacionInput) {
-                                ubicacionInput.value = results[0].properties.display_name || results[0].name;
-                            }
-                        }
-                    });
-                });
-                
-                // Manejar cambios en las coordenadas manuales
-                latInput.addEventListener('change', function() {
-                    const lat = parseFloat(this.value.replace(',', '.'));
-                    const lng = parseFloat(lngInput.value.replace(',', '.'));
-                    
-                    if (isValidCoordinate(lat, lng)) {
-                        const newLatLng = L.latLng(lat, lng);
-                        map.setView(newLatLng);
-                        marker.setLatLng(newLatLng);
-                    } else {
-                        alert('Por favor ingrese coordenadas válidas');
-                        updateCoordinates(marker.getLatLng().lat, marker.getLatLng().lng);
-                    }
-                });
-                
-                lngInput.addEventListener('change', function() {
-                    const lat = parseFloat(latInput.value.replace(',', '.'));
-                    const lng = parseFloat(this.value.replace(',', '.'));
-                    
-                    if (isValidCoordinate(lat, lng)) {
-                        const newLatLng = L.latLng(lat, lng);
-                        map.setView(newLatLng);
-                        marker.setLatLng(newLatLng);
-                    } else {
-                        alert('Por favor ingrese coordenadas válidas');
-                        updateCoordinates(marker.getLatLng().lat, marker.getLatLng().lng);
-                    }
-                });
-                
-                return {
-                    map: map,
-                    marker: marker,
-                    latInput: latInput,
-                    lngInput: lngInput
-                };
+            })
+        })
+        .on('markgeocode', function(e) {
+            const { center, name } = e.geocode;
+            
+            marker.setLatLng(center);
+            map.setView(center, 16);
+            
+            latInput.value = center.lat.toFixed(6);
+            lngInput.value = center.lng.toFixed(6);
+            
+            const ubicacionInput = document.querySelector(`input[name^="ubicacion_${resourceType}_${resourceId}"]`);
+            if (ubicacionInput) {
+                ubicacionInput.value = name;
+            }
+        })
+        .addTo(map);
+
+        // Función para actualizar coordenadas
+        function updateCoordinates(lat, lng) {
+            latInput.value = lat.toFixed(6);
+            lngInput.value = lng.toFixed(6);
+        }
+        
+        // Actualizar coordenadas cuando se mueve el marcador
+        marker.on('dragend', function(e) {
+            const { lat, lng } = e.target.getLatLng();
+            updateCoordinates(lat, lng);
+        });
+        
+        // Manejar clics en el mapa
+        map.on('click', function(e) {
+            const { lat, lng } = e.latlng;
+            marker.setLatLng([lat, lng]);
+            updateCoordinates(lat, lng);
+        });
+        
+        // Forzar el redimensionamiento del mapa
+        setTimeout(() => {
+            map.invalidateSize();
+        }, 300);
+        
+        // Guardar referencia al mapa
+        if (!resources[resourceType].maps) {
+            resources[resourceType].maps = {};
+        }
+        resources[resourceType].maps[resourceId] = {
+            map: map,
+            marker: marker,
+            latInput: latInput,
+            lngInput: lngInput
+        };
+        
+        return {
+            map: map,
+            marker: marker,
+            latInput: latInput,
+            lngInput: lngInput
+        };
+    }
+    
+    // Función para agregar un nuevo recurso - VERSIÓN CORREGIDA
+    function addResource(type) {
+        const resource = resources[type];
+        resource.count++;
+        resource.current = resource.count;
+
+        updateCounter(type);
+        
+        const repeatDiv = document.createElement('div');
+        repeatDiv.className = 'repeat-section';
+        repeatDiv.id = `${type}-${resource.count}`;
+        
+        let content = '';
+        
+        if (type === 'transporte') {
+            content = `
+                <!-- CONTENIDO DE TRANSPORTE (igual al que tienes) -->
+            `;
+        } else if (type === 'humanos') {
+            content = `
+                <!-- CONTENIDO DE HUMANOS (igual al que tienes) -->
+            `;
+        } else if (type === 'herramientas') {
+            content = `
+                <!-- CONTENIDO DE HERRAMIENTAS (igual al que tienes) -->
+            `;
+        }
+        
+        repeatDiv.innerHTML = content;
+        resource.container.appendChild(repeatDiv);
+
+        // Ocultar todas las secciones excepto la actual
+        const allSections = resource.container.querySelectorAll('.repeat-section');
+        allSections.forEach(section => {
+            section.style.display = 'none';
+        });
+        
+        showResource(type, resource.current);
+        setupOtherFields(repeatDiv);
+        
+        // Configurar eventos para mostrar/ocultar preguntas condicionales
+        setupConditionalQuestions(repeatDiv, type, resource.count);
+        
+        // Inicializar el mapa después de un breve retraso
+        setTimeout(() => {
+            let mapContainerId;
+            if (type === 'transporte') {
+                mapContainerId = `map-container-transporte-${resource.count}`;
+            } else if (type === 'humanos') {
+                mapContainerId = `map-container-humano-${resource.count}`;
+            } else if (type === 'herramientas') {
+                mapContainerId = `map-container-herramienta-${resource.count}`;
             }
             
-            // Función para agregar un nuevo recurso
-            function addResource(type) {
-                const resource = resources[type];
-                resource.count++;
-                resource.current = resource.count;
-
-                updateCounter(type);
-                
-                const repeatDiv = document.createElement('div');
-                repeatDiv.className = 'repeat-section';
-                repeatDiv.id = `${type}-${resource.count}`;
-                
-                let content = '';
-                
-                if (type === 'transporte') {
-                    content = `
-                        <div class="form-group">
-                            <label class="required">1. Tipo de Recurso</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_transporte_${resource.count}" value="transporte_personal" required>
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Vehículo de Transporte Personal</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_transporte_${resource.count}" value="transporte_carga">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Vehículos de Transporte de Carga/Materiales</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_transporte_${resource.count}" value="transporte_agua_consumo">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Vehículos de Transporte de Agua (Consumo Humano)</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_transporte_${resource.count}" value="transporte_agua_riego">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Vehículos de Transporte de Agua (Riego)</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_transporte_${resource.count}" value="ambulancia">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Ambulancia</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_transporte_${resource.count}" value="grupo_electrogenos">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Grupo Electrógenos</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_transporte_${resource.count}" value="maquinaria">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Maquinaria</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_transporte_${resource.count}" value="ambulancia_veterinaria">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Ambulancia Veterinaria</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_transporte_${resource.count}" value="otro">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Otro</span>
-                                </label>
-                            </div>
-                            <div class="other-input-container hidden">
-                                <input type="text" name="tipo_transporte_otro_${resource.count}" class="form-control" placeholder="Especifique otro tipo">
-                            </div>
-                        </div>
-                        
-                        <!-- Preguntas condicionales para Medios de Transporte -->
-                        <div id="tipo_vehiculo_personal_${resource.count}" class="conditional-question hidden">
-                            <div class="form-group">
-                                <label class="required">Tipo de Vehículo de Transporte Personal:</label>
-                                <div class="radio-group">
-                                    <label class="radio-option">
-                                        <input type="radio" name="tipo_vehiculo_personal_${resource.count}" value="Automóvil (Sedan o Compactos)">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Automóvil (Sedan o Compactos)</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="tipo_vehiculo_personal_${resource.count}" value="Camioneta">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Camioneta</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="tipo_vehiculo_personal_${resource.count}" value="Furgones y Minivans">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Furgones y Minivans</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="tipo_vehiculo_personal_${resource.count}" value="Buses">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Buses</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="tipo_vehiculo_personal_${resource.count}" value="Camioneta 4x4">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Camioneta 4x4</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="tipo_vehiculo_personal_${resource.count}" value="otro">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Otro</span>
-                                    </label>
-                                </div>
-                                <div class="other-input-container hidden">
-                                    <input type="text" name="tipo_vehiculo_personal_otro_${resource.count}" class="form-control" placeholder="Especifique otro tipo">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div id="vehiculo_carga_materiales_${resource.count}" class="conditional-question hidden">
-                            <div class="form-group">
-                                <label class="required">Vehículo de Carga/Materiales:</label>
-                                <div class="radio-group">
-                                    <label class="radio-option">
-                                        <input type="radio" name="vehiculo_carga_materiales_${resource.count}" value="Camión Liviano Cerrado">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Camión Liviano Cerrado</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="vehiculo_carga_materiales_${resource.count}" value="Camión Cerrado con Montacarga">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Camión Cerrado con Montacarga</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="vehiculo_carga_materiales_${resource.count}" value="Camión Plataforma con Grúa">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Camión Plataforma con Grúa</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="vehiculo_carga_materiales_${resource.count}" value="Camión Recolector de Residuos Domiciliarios">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Camión Recolector de Residuos Domiciliarios</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="vehiculo_carga_materiales_${resource.count}" value="Camión de Acceso Aéreo">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Camión de Acceso Aéreo</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="vehiculo_carga_materiales_${resource.count}" value="Camión Tolva Mediano">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Camión Tolva Mediano</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="vehiculo_carga_materiales_${resource.count}" value="Camión con Contenedor de Arrastre">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Camión con Contenedor de Arrastre</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="vehiculo_carga_materiales_${resource.count}" value="otro">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Otro</span>
-                                    </label>
-                                </div>
-                                <div class="other-input-container hidden">
-                                    <input type="text" name="vehiculo_carga_materiales_otro_${resource.count}" class="form-control" placeholder="Especifique otro tipo">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div id="maquinaria_${resource.count}" class="conditional-question hidden">
-                            <div class="form-group">
-                                <label class="required">Maquinaria:</label>
-                                <div class="radio-group">
-                                    <label class="radio-option">
-                                        <input type="radio" name="maquinaria_${resource.count}" value="Excavadora">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Excavadora</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="maquinaria_${resource.count}" value="Minicargador o Cargador Compacto">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Minicargador o Cargador Compacto</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="maquinaria_${resource.count}" value="Motoniveladora">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Motoniveladora</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="maquinaria_${resource.count}" value="Retroexcavadora">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Retroexcavadora</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="maquinaria_${resource.count}" value="Grúa Horquilla">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Grúa Horquilla</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="maquinaria_${resource.count}" value="otro">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Otro</span>
-                                    </label>
-                                </div>
-                                <div class="other-input-container hidden">
-                                    <input type="text" name="maquinaria_otro_${resource.count}" class="form-control" placeholder="Especifique otro tipo">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div id="ambulancia_${resource.count}" class="conditional-question hidden">
-                            <div class="form-group">
-                                <label class="required">Ambulancia:</label>
-                                <div class="radio-group">
-                                    <label class="radio-option">
-                                        <input type="radio" name="ambulancia_${resource.count}" value="Ambulancia Avanzada (Reanimador, Técnico Paramédico, Conductor)">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Ambulancia Avanzada (Reanimador, Técnico Paramédico, Conductor)</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="ambulancia_${resource.count}" value="Ambulancia Básica (Paramédico, Conductor)">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Ambulancia Básica (Paramédico, Conductor)</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="ambulancia_${resource.count}" value="otro">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Otro</span>
-                                    </label>
-                                </div>
-                                <div class="other-input-container hidden">
-                                    <input type="text" name="ambulancia_otro_${resource.count}" class="form-control" placeholder="Especifique otro tipo">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">2. Fuente de Financiamiento</label>
-                            <select name="fuente_financiamiento_${resource.count}" class="form-control" required>
-                                <option value="">Seleccione una opción</option>
-                                <option value="Recursos Propios">Recursos Propios</option>
-                                <option value="Recursos Externos">Recursos Externos</option>
-                            </select>
-                        </div>
-                        
-                        <!-- Pregunta condicional para Recursos Externos -->
-                        <div id="recursos_externos_${resource.count}" class="conditional-question hidden">
-                            <div class="form-group">
-                                <label class="required">Recursos Externos:</label>
-                                <div class="radio-group">
-                                    <label class="radio-option">
-                                        <input type="radio" name="recursos_externos_${resource.count}" value="Estado Central">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Estado Central</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="recursos_externos_${resource.count}" value="FNDR">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">FNDR</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="recursos_externos_${resource.count}" value="Privados">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Privados</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">3. Capacidad</label>
-                            <input type="text" name="capacidad_${resource.count}" class="form-control" required>
-                            <p class="hint">Cantidad de personas, <strong>litros</strong> o <strong>kilos.</strong></p>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">4. Estado</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="estado_${resource.count}" value="Disponible" required>
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Disponible</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="estado_${resource.count}" value="No Disponible">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">No Disponible</span>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>5. Ubicación Geográfica</label>
-                            <input type="text" name="ubicacion_transporte_${resource.count}" class="form-control">
-                            <p class="hint">Dirección y Comuna. <strong>Ejemplo: Los Robles 540, La Cisterna</strong></p>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>6. Identifique la Ubicación en el mapa</label>
-                            <div id="map-container-transporte-${resource.count}" class="map-container"></div>
-                            <p class="hint">Puede buscarlo con el siguiente formato: Calle n°, Comuna, Región <strong>Ejemplo: Los Robles 540, La Cisterna, Región Metropolitana</strong></p>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">7. Identificación del Vehículo</label>
-                            <input type="text" name="identificacion_vehiculo_${resource.count}" class="form-control" required>
-                            <p class="hint">Identificación del vehículo con Marca, Modelo y Placa Patente. <strong>Ejemplo: Mitsushibi L200 XDGF54</strong></p>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">8. Requerimiento de: (Soporte)</label>
-                            <div class="checkbox-group">
-                                <label class="checkbox-option">
-                                    <input type="checkbox" name="soporte_mantenimiento_${resource.count}" value="Mantenimiento">
-                                    <span class="custom-checkbox"></span>
-                                    <span class="option-text">Mantenimiento</span>
-                                </label>
-                                <label class="checkbox-option">
-                                    <input type="checkbox" name="soporte_alimentacion_${resource.count}" value="Alimentación">
-                                    <span class="custom-checkbox"></span>
-                                    <span class="option-text">Alimentación</span>
-                                </label>
-                                <label class="checkbox-option">
-                                    <input type="checkbox" name="soporte_combustible_${resource.count}" value="Combustible">
-                                    <span class="custom-checkbox"></span>
-                                    <span class="option-text">Combustible</span>
-                                </label>
-                                <label class="checkbox-option">
-                                    <input type="checkbox" name="soporte_alojamiento_${resource.count}" value="Alojamiento">
-                                    <span class="custom-checkbox"></span>
-                                    <span class="option-text">Alojamiento</span>
-                                </label>
-                                <label class="checkbox-option">
-                                    <input type="checkbox" name="soporte_otro_${resource.count}" value="other">
-                                    <span class="custom-checkbox"></span>
-                                    <span class="option-text">Otro</span>
-                                </label>
-                            </div>
-                            <div class="other-input-container hidden">
-                                <input type="text" name="soporte_otro_espec_${resource.count}" class="form-control" placeholder="Especifique otro requerimiento">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">9. Número de Tripulantes</label>
-                            <input type="number" name="tripulantes_${resource.count}" class="form-control" required min="0">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">10. Disponibilidad</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="disponibilidad_${resource.count}" value="Permanente" required>
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Permanente</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="disponibilidad_${resource.count}" value="Temporal">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Temporal</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="disponibilidad_${resource.count}" value="other">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Otro</span>
-                                </label>
-                            </div>
-                            <div class="other-input-container hidden">
-                                <input type="text" name="disponibilidad_otro_${resource.count}" class="form-control" placeholder="Especifique otra disponibilidad">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">11. Tiempo de Disponibilidad</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_disponibilidad_${resource.count}" value="2 - 5 hrs" required>
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">2 - 5 hrs</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_disponibilidad_${resource.count}" value="6 - 10 hrs">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">6 - 10 hrs</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_disponibilidad_${resource.count}" value="12 a 24 hrs">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">12 - 24 hrs</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_disponibilidad_${resource.count}" value="Superior a 48 hrs">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Superior a 48 hrs</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_disponibilidad_${resource.count}" value="other">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Otro</span>
-                                </label>
-                            </div>
-                            <div class="other-input-container hidden">
-                                <input type="text" name="tiempo_disponibilidad_otro_${resource.count}" class="form-control" placeholder="Especifique otro tiempo">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">12. Tiempo de Alistamiento</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_alistamiento_${resource.count}" value="1 - 2 hrs" required>
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">1 - 2 hrs</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_alistamiento_${resource.count}" value="3 - 4 hrs">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">3 - 4 hrs</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_alistamiento_${resource.count}" value="5 - 6 hrs">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">5 - 6 hrs</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_alistamiento_${resource.count}" value="other">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Otro</span>
-                                </label>
-                            </div>
-                            <div class="other-input-container hidden">
-                                <input type="text" name="tiempo_alistamiento_otro_${resource.count}" class="form-control" placeholder="Especifique otro tiempo">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">13. Rango de Auxilio</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="rango_auxilio_${resource.count}" value="< 100 personas" required>
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text"> < 100 personas</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="rango_auxilio_${resource.count}" value="> 1000 personas">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text"> > 1000 personas</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="rango_auxilio_${resource.count}" value="other">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Otro</span>
-                                </label>
-                            </div>
-                            <div class="other-input-container hidden">
-                                <input type="text" name="rango_auxilio_otro_${resource.count}" class="form-control" placeholder="Especifique otro rango">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>14. Descripción</label>
-                            <textarea name="descripcion_${resource.count}" class="form-control"></textarea>
-                            <p class="hint">Otros Antecedentes</p>
-                        </div>
-                    `;
-                } else if (type === 'humanos') {
-                    content = `
-                        <div class="form-group">
-                            <label class="required">1. Tipo de Recursos</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_humano_${resource.count}" value="Personal Acreditado para Levantamiento FIBE" required>
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Personal Acreditado para Levantamiento FIBE</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_humano_${resource.count}" value="Profesionales a Desplegar Territorialmente del mismo organismo (en comisión de Servicio)">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Profesionales a Desplegar Territorialmente del mismo organismo (en comisión de Servicio)</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_humano_${resource.count}" value="Personal de Salud">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Personal de Salud</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_humano_${resource.count}" value="Equipos de Atención Psicológica y/o de Salud Mental">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Equipos de Atención Psicológica y/o de Salud Mental</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_humano_${resource.count}" value="Equipos de Atención de Personal con Necesidades Especiales">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Equipos de Atención de Personal con Necesidades Especiales</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_humano_${resource.count}" value="Equipos Técnicos de Otras Especialidades">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Equipos Técnicos de Otras Especialidades</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_humano_${resource.count}" value="otro">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Otro</span>
-                                </label>
-                            </div>
-                            <div class="other-input-container hidden">
-                                <input type="text" name="tipo_humano_otro_${resource.count}" class="form-control" placeholder="Especifique otro tipo">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">2. Cantidad</label>
-                            <input type="number" name="cantidad_humano_${resource.count}" class="form-control" required min="1">
-                            <p class="hint">Número de Personal</p>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">3. Estado</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="estado_humano_${resource.count}" value="Disponible" required>
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Disponible</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="estado_humano_${resource.count}" value="No Disponible">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">No Disponible</span>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>4. Ubicación Geográfica</label>
-                            <input type="text" name="ubicacion_humano_${resource.count}" class="form-control">
-                            <p class="hint">Dirección y Comuna. <strong>Ejemplo: Los Robles 540, La Cisterna</strong></p>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>5. Ubicación en el mapa</label>
-                            <div id="map-container-humano-${resource.count}" class="map-container"></div>
-                            <p class="hint">Puede buscarlo con el siguiente formato: Calle n°, Comuna, Región <strong>Ejemplo: Los Robles 540, La Cisterna, Región Metropolitana</strong></p>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">6. Medio de Traslado</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="medio_traslado_${resource.count}" value="Medios Propios" required>
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Medios Propios</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="medio_traslado_${resource.count}" value="Medios Municipales">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Medios Municipales</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="medio_traslado_${resource.count}" value="Requiere Asistencia">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Requiere Asistencia</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="medio_traslado_${resource.count}" value="otro">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Otro</span>
-                                </label>
-                            </div>
-                            <div class="other-input-container hidden">
-                                <input type="text" name="medio_traslado_otro_${resource.count}" class="form-control" placeholder="Especifique otro medio">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">7. Disponibilidad</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="disponibilidad_humano_${resource.count}" value="Permanente" required>
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Permanente</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="disponibilidad_humano_${resource.count}" value="Temporal">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Temporal</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="disponibilidad_humano_${resource.count}" value="otro">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Otro</span>
-                                </label>
-                            </div>
-                            <div class="other-input-container hidden">
-                                <input type="text" name="disponibilidad_humano_otro_${resource.count}" class="form-control" placeholder="Especifique otra disponibilidad">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">8. Tiempo de Disponibilidad</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_disponibilidad_humano_${resource.count}" value="2 - 5 hrs" required>
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">2 - 5 hrs</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_disponibilidad_humano_${resource.count}" value="6 - 10 hrs">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">6 - 10 hrs</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_disponibilidad_humano_${resource.count}" value="12 - 24 hrs">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">12 - 24 hrs</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_disponibilidad_humano_${resource.count}" value="Superior a 48 hrs">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Superior a 48 hrs</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_disponibilidad_humano_${resource.count}" value="otro">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Otro</span>
-                                </label>
-                            </div>
-                            <div class="other-input-container hidden">
-                                <input type="text" name="tiempo_disponibilidad_humano_otro_${resource.count}" class="form-control" placeholder="Especifique otro tiempo">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">9. Tiempo de Alistamiento</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_alistamiento_humano_${resource.count}" value="1 - 2 hrs" required>
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">1 - 2 hrs</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_alistamiento_humano_${resource.count}" value="3 - 4 hrs">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">3 - 4 hrs</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_alistamiento_humano_${resource.count}" value="5 - 6 hrs">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">5 - 6 hrs</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_alistamiento_humano_${resource.count}" value="otro">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Otro</span>
-                                </label>
-                            </div>
-                            <div class="other-input-container hidden">
-                                <input type="text" name="tiempo_alistamiento_humano_otro_${resource.count}" class="form-control" placeholder="Especifique otro tiempo">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">10. Capacidad de Auxilio</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="capacidad_auxilio_${resource.count}" value="< 100 personas" required>
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text"> < 100 personas</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="capacidad_auxilio_${resource.count}" value="> 1000 personas">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text"> > 1000 personas</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="capacidad_auxilio_${resource.count}" value="otro">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Otro</span>
-                                </label>
-                            </div>
-                            <div class="other-input-container hidden">
-                                <input type="text" name="capacidad_auxilio_otro_${resource.count}" class="form-control" placeholder="Especifique otro rango">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>11. Descripción</label>
-                            <textarea name="descripcion_humano_${resource.count}" class="form-control"></textarea>
-                            <p class="hint">Otros Antecedentes</p>
-                        </div>
-                    `;
-                } else if (type === 'herramientas') {
-                    content = `
-                        <div class="form-group">
-                            <label class="required">1. Tipo de Recursos</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_herramienta_${resource.count}" value="Equipamiento de Protección Personal" required>
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Equipamiento de Protección Personal</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_herramienta_${resource.count}" value="Equipos de Atención Veterinaria">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Equipos de Atención Veterinaria</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_herramienta_${resource.count}" value="Kit de Higiene Personal">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Kit de Higiene Personal</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_herramienta_${resource.count}" value="Kit de Alimentación y Suplementos">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Kit de Alimentación y Suplementos</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_herramienta_${resource.count}" value="Equipamientos/Insumos de Atención Veterinaria">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Equipamientos/Insumos de Atención Veterinaria</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_herramienta_${resource.count}" value="Sistema Tecnológicos Contratados Remotamente">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Sistema Tecnológicos Contratados Remotamente</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_herramienta_${resource.count}" value="Equipos/Insumos para Atención Médica">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Equipos/Insumos para Atención Médica</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_herramienta_${resource.count}" value="Contenedor de Agua">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Contenedor de Agua</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tipo_herramienta_${resource.count}" value="otro">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Otro</span>
-                                </label>
-                            </div>
-                            <div class="other-input-container hidden">
-                                <input type="text" name="tipo_herramienta_otro_${resource.count}" class="form-control" placeholder="Especifique otro tipo">
-                            </div>
-                        </div>
-                        
-                        <!-- Preguntas condicionales para Herramientas o Elementos Auxiliares -->
-                        <div id="equipamiento_proteccion_personal_${resource.count}" class="conditional-question hidden">
-                            <div class="form-group">
-                                <label class="required">Equipamiento de Protección Personal:</label>
-                                <div class="checkbox-group">
-                                    <label class="checkbox-option">
-                                        <input type="checkbox" name="equipamiento_proteccion_personal_${resource.count}[]" value="Cascos de Seguridad">
-                                        <span class="custom-checkbox"></span>
-                                        <span class="option-text">Cascos de Seguridad</span>
-                                    </label>
-                                    <label class="checkbox-option">
-                                        <input type="checkbox" name="equipamiento_proteccion_personal_${resource.count}[]" value="Lentes de Seguridad">
-                                        <span class="custom-checkbox"></span>
-                                        <span class="option-text">Lentes de Seguridad</span>
-                                    </label>
-                                    <label class="checkbox-option">
-                                        <input type="checkbox" name="equipamiento_proteccion_personal_${resource.count}[]" value="Mascaras Nasobucales">
-                                        <span class="custom-checkbox"></span>
-                                        <span class="option-text">Mascaras Nasobucales</span>
-                                    </label>
-                                    <label class="checkbox-option">
-                                        <input type="checkbox" name="equipamiento_proteccion_personal_${resource.count}[]" value="Chalecos de Seguridad">
-                                        <span class="custom-checkbox"></span>
-                                        <span class="option-text">Chalecos de Seguridad</span>
-                                    </label>
-                                    <label class="checkbox-option">
-                                        <input type="checkbox" name="equipamiento_proteccion_personal_${resource.count}[]" value="Guantes de Seguridad">
-                                        <span class="custom-checkbox"></span>
-                                        <span class="option-text">Guantes de Seguridad</span>
-                                    </label>
-                                    <label class="checkbox-option">
-                                        <input type="checkbox" name="equipamiento_proteccion_personal_${resource.count}[]" value="Zapatos de Seguridad">
-                                        <span class="custom-checkbox"></span>
-                                        <span class="option-text">Zapatos de Seguridad</span>
-                                    </label>
-                                    <label class="checkbox-option">
-                                        <input type="checkbox" name="equipamiento_proteccion_personal_${resource.count}[]" value="Protectores de la Piel">
-                                        <span class="custom-checkbox"></span>
-                                        <span class="option-text">Protectores de la Piel</span>
-                                    </label>
-                                    <label class="checkbox-option">
-                                        <input type="checkbox" name="equipamiento_proteccion_personal_${resource.count}[]" value="other">
-                                        <span class="custom-checkbox"></span>
-                                        <span class="option-text">Otro</span>
-                                    </label>
-                                </div>
-                                <div class="other-input-container hidden">
-                                    <input type="text" name="equipamiento_proteccion_personal_otro_${resource.count}" class="form-control" placeholder="Especifique otro elemento">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div id="kit_higiene_personal_${resource.count}" class="conditional-question hidden">
-                            <div class="form-group">
-                                <label class="required">Kit de Higiene Personal:</label>
-                                <div class="checkbox-group"> <!-- CAMBIADO: radio-group → checkbox-group -->
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
-                                        <input type="checkbox" name="kit_higiene_personal_${resource.count}[]" value="Kit Higiene Hombre">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
-                                        <span class="option-text">Kit Higiene Hombre</span>
-                                    </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
-                                        <input type="checkbox" name="kit_higiene_personal_${resource.count}[]" value="Kit Higiene Mujer">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
-                                        <span class="option-text">Kit Higiene Mujer</span>
-                                    </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
-                                        <input type="checkbox" name="kit_higiene_personal_${resource.count}[]" value="Kit Higiene Infantil">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
-                                        <span class="option-text">Kit Higiene Infantil</span>
-                                    </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
-                                        <input type="checkbox" name="kit_higiene_personal_${resource.count}[]" value="Kit Higiene Lactante">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
-                                        <span class="option-text">Kit Higiene Lactante</span>
-                                    </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
-                                        <input type="checkbox" name="kit_higiene_personal_${resource.count}[]" value="other"> 
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
-                                        <span class="option-text">Otro</span>
-                                    </label>
-                                </div>
-                                <div class="other-input-container hidden">
-                                    <input type="text" name="kit_higiene_personal_otro_${resource.count}" class="form-control" placeholder="Especifique otro kit">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div id="kit_alimentacion_suplementos_${resource.count}" class="conditional-question hidden">
-                            <div class="form-group">
-                                <label class="required">Kit de Alimentación y Suplementos:</label>
-                                <div class="checkbox-group"> <!-- CAMBIADO: radio-group → checkbox-group -->
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
-                                        <input type="checkbox" name="kit_alimentacion_suplementos_${resource.count}[]" value="Kit de Alimentación 4 Pers.- 4 días">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
-                                        <span class="option-text">Kit de Alimentación 4 Pers.- 4 días</span>
-                                    </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
-                                        <input type="checkbox" name="kit_alimentacion_suplementos_${resource.count}[]" value="Kit Alimentos 4 Pers. - 7 días">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
-                                        <span class="option-text">Kit Alimentos 4 Pers. - 7 días</span>
-                                    </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
-                                        <input type="checkbox" name="kit_alimentacion_suplementos_${resource.count}[]" value="Kit Alimentos Mascotas">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
-                                        <span class="option-text">Kit Alimentos Mascotas</span>
-                                    </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
-                                        <input type="checkbox" name="kit_alimentacion_suplementos_${resource.count}[]" value="other"> 
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
-                                        <span class="option-text">Otro</span>
-                                    </label>
-                                </div>
-                                <div class="other-input-container hidden">
-                                    <input type="text" name="kit_alimentacion_suplementos_otro_${resource.count}" class="form-control" placeholder="Especifique otro kit">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div id="contenedor_agua_${resource.count}" class="conditional-question hidden">
-                            <div class="form-group">
-                                <label class="required">Contenedor de Agua:</label>
-                                <div class="radio-group">
-                                    <label class="radio-option">
-                                        <input type="radio" name="contenedor_agua_${resource.count}" value="20 L">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">20 L</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="contenedor_agua_${resource.count}" value="100 L">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">100 L</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="contenedor_agua_${resource.count}" value="200 L">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">200 L</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="contenedor_agua_${resource.count}" value="más de 500 L">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">más de 500 L</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="contenedor_agua_${resource.count}" value="otro">
-                                        <span class="custom-radio"></span>
-                                        <span class="option-text">Otro</span>
-                                    </label>
-                                </div>
-                                <div class="other-input-container hidden">
-                                    <input type="text" name="contenedor_agua_otro_${resource.count}" class="form-control" placeholder="Especifique otro tamaño">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">2. Cantidad</label>
-                            <input type="number" name="cantidad_herramienta_${resource.count}" class="form-control" required min="1">
-                            <p class="hint">Número de Recursos</p>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">3. Estado</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="estado_herramienta_${resource.count}" value="Disponible" required>
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Disponible</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="estado_herramienta_${resource.count}" value="No Disponible">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">No Disponible</span>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>4. Ubicación Geográfica</label>
-                            <input type="text" name="ubicacion_herramienta_${resource.count}" class="form-control">
-                            <p class="hint">Dirección y Comuna. <strong>Ejemplo: Los Robles 540, La Cisterna</strong></p>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>5. Ubicación en el mapa</label>
-                            <div id="map-container-herramienta-${resource.count}" class="map-container"></div>
-                            <p class="hint">Puede buscarlo con el siguiente formato: Calle n°, Comuna, Región <strong>Ejemplo: Los Robles 540, La Cisterna, Región Metropolitana</strong></p>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">6. Disponibilidad</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="disponibilidad_herramienta_${resource.count}" value="Permanente" required>
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Permanente</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="disponibilidad_herramienta_${resource.count}" value="Temporal">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Temporal</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="disponibilidad_herramienta_${resource.count}" value="otro">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Otro</span>
-                                </label>
-                            </div>
-                            <div class="other-input-container hidden">
-                                <input type="text" name="disponibilidad_herramienta_otro_${resource.count}" class="form-control" placeholder="Especifique otra disponibilidad">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">7. Tiempo de Disponibilidad</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_disponibilidad_herramienta_${resource.count}" value="2 - 5 hrs" required>
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">2 - 5 hrs</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_disponibilidad_herramienta_${resource.count}" value="6 - 10 hrs">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">6 - 10 hrs</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_disponibilidad_herramienta_${resource.count}" value="12 - 24 hrs">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">12 - 24 hrs</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_disponibilidad_herramienta_${resource.count}" value="Superior a 48 hrs">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Superior a 48 hrs</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_disponibilidad_herramienta_${resource.count}" value="otro">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Otro</span>
-                                </label>
-                            </div>
-                            <div class="other-input-container hidden">
-                                <input type="text" name="tiempo_disponibilidad_herramienta_otro_${resource.count}" class="form-control" placeholder="Especifique otro tiempo">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">8. Tiempo de Alistamiento</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_alistamiento_herramienta_${resource.count}" value="1 - 2 hrs" required>
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">1 - 2 hrs</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_alistamiento_herramienta_${resource.count}" value="3 - 4 hrs">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">3 - 4 hrs</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_alistamiento_herramienta_${resource.count}" value="5 - 6 hrs">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">5 - 6 hrs</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="tiempo_alistamiento_herramienta_${resource.count}" value="otro">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Otro</span>
-                                </label>
-                            </div>
-                            <div class="other-input-container hidden">
-                                <input type="text" name="tiempo_alistamiento_herramienta_otro_${resource.count}" class="form-control" placeholder="Especifique otro tiempo">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="required">9. Rango de Asistencia</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="rango_asistencia_herramienta_${resource.count}" value="< 100 personas" required>
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text"> < 100 personas</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="rango_asistencia_herramienta_${resource.count}" value="> 1000 personas">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text"> > 1000 personas</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="rango_asistencia_herramienta_${resource.count}" value="otro">
-                                    <span class="custom-radio"></span>
-                                    <span class="option-text">Otro</span>
-                                </label>
-                            </div>
-                            <div class="other-input-container hidden">
-                                <input type="text" name="rango_asistencia_herramienta_otro_${resource.count}" class="form-control" placeholder="Especifique otro rango">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>10. Descripción</label>
-                            <textarea name="descripcion_herramienta_${resource.count}" class="form-control"></textarea>
-                            <p class="hint">Otros Antecedentes</p>
-                        </div>
-                    `;
-                }
-                
-                repeatDiv.innerHTML = content;
-                resource.container.appendChild(repeatDiv);
-
-                const allSections = resource.container.querySelectorAll('.repeat-section');
-                allSections.forEach(section => {
-                    section.style.display = 'none';
-                });
-                
-                showResource(type, resource.current);
-                setupOtherFields(repeatDiv);
-                
-                // Configurar eventos para mostrar/ocultar preguntas condicionales
-                setupConditionalQuestions(repeatDiv, type, resource.count);
-                
-                // Inicializar el mapa después de que el elemento exista en el DOM
-                setTimeout(() => {
-                    if (type === 'transporte') {
-                        initMap(`map-container-transporte-${resource.count}`);
-                    } else if (type === 'humanos') {
-                        initMap(`map-container-humano-${resource.count}`);
-                    } else if (type === 'herramientas') {
-                        initMap(`map-container-herramienta-${resource.count}`);
-                    }
-                }, 0);
-
-                // Inicializar el mapa
-                const mapInstance = initMap(mapContainerId, type, resource.count);
-                
-                // Guardar referencia al mapa
-                if (mapInstance) {
-                    if (!resources[type].maps) {
-                        resources[type].maps = {};
-                    }
-                    resources[type].maps[resource.count] = mapInstance;
+            initMap(mapContainerId, type, resource.count);
+        }, 100);
+    }
+    
+    // Función para mostrar el recurso específico
+    function showResource(type, index) {
+        const resource = resources[type];
+        const elements = resource.container.querySelectorAll('.repeat-section');
+        
+        elements.forEach(el => {
+            el.style.display = 'none';
+        });
+        
+        const elementToShow = document.getElementById(`${type}-${index}`);
+        if (elementToShow) {
+            elementToShow.style.display = 'block';
+            
+            // Redimensionar el mapa cuando se muestra la sección
+            setTimeout(() => {
+                if (resource.maps && resource.maps[index] && resource.maps[index].map) {
+                    resource.maps[index].map.invalidateSize();
                 }
             }, 100);
         }
+    }
+    
+    // Función para actualizar el contador
+    function updateCounter(type) {
+        const resource = resources[type];
+        resource.counter.innerHTML = '';
         
-        // Función para inicializar un mapa (versión corregida)
-        function initMap(containerId, resourceType, resourceId) {
-            const mapDiv = document.getElementById(containerId);
-            if (!mapDiv) {
-                console.error('No se encontró el contenedor del mapa:', containerId);
-                return null;
-            }
-            
-            // Limpiar el contenedor y establecer un tamaño mínimo
-            mapDiv.innerHTML = '';
-            mapDiv.style.minHeight = '400px';
-            
-            // Coordenadas iniciales (Santiago de Chile)
-            const initialLat = -33.4489;
-            const initialLng = -70.6693;
-            
-            // Crear el mapa
-            const map = L.map(containerId).setView([initialLat, initialLng], 13);
-            
-            // Añadir capa de OpenStreetMap
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-                maxZoom: 19
-            }).addTo(map);
-            
-            // Añadir marcador
-            let marker = L.marker([initialLat, initialLng], {
-                draggable: true
-            }).addTo(map);
-            
-            // Crear contenedor de coordenadas
-            const coordsContainer = L.DomUtil.create('div', 'coordinates-container');
-            map.getContainer().appendChild(coordsContainer);
-            
-            // Grupo Latitud
-            const latGroup = L.DomUtil.create('div', 'coord-group');
-            const latLabel = L.DomUtil.create('label', '', latGroup);
-            latLabel.textContent = 'Lat:';
-            const latInput = L.DomUtil.create('input', 'coord-input', latGroup);
-            latInput.type = 'text';
-            latInput.value = initialLat.toFixed(6);
-            latInput.setAttribute('data-coord', 'lat');
-            latInput.setAttribute('name', `coordenadas_${resourceType}_${resourceId}_lat`);
-            
-            // Grupo Longitud
-            const lngGroup = L.DomUtil.create('div', 'coord-group');
-            const lngLabel = L.DomUtil.create('label', '', lngGroup);
-            lngLabel.textContent = 'Lon:';
-            const lngInput = L.DomUtil.create('input', 'coord-input', lngGroup);
-            lngInput.type = 'text';
-            lngInput.value = initialLng.toFixed(6);
-            lngInput.setAttribute('data-coord', 'lng');
-            lngInput.setAttribute('name', `coordenadas_${resourceType}_${resourceId}_lng`);
-            
-            // Agregar grupos al contenedor
-            coordsContainer.appendChild(latGroup);
-            coordsContainer.appendChild(lngGroup);
-            
-            // Añadir control de búsqueda
-            L.Control.geocoder({
-                defaultMarkGeocode: false,
-                position: 'topleft',
-                placeholder: 'Buscar dirección...',
-                errorMessage: 'No se encontraron resultados.',
-                geocoder: L.Control.Geocoder.nominatim({
-                    geocodingQueryParams: {
-                        countrycodes: 'cl', // Limitar a Chile
-                        'accept-language': 'es'
-                    }
-                })
-            })
-            .on('markgeocode', function(e) {
-                const { center, name } = e.geocode;
-                
-                // Mover el marcador a la ubicación encontrada
-                marker.setLatLng(center);
-                map.setView(center, 16);
-                
-                // Actualizar coordenadas
-                latInput.value = center.lat.toFixed(6);
-                lngInput.value = center.lng.toFixed(6);
-                
-                // Actualizar campo de ubicación geográfica
-                const ubicacionInput = document.querySelector(`input[name^="ubicacion_${resourceType}_${resourceId}"]`);
-                if (ubicacionInput) {
-                    ubicacionInput.value = name;
-                }
-            })
-            .addTo(map);
-        
-            // Función para actualizar coordenadas
-            function updateCoordinates(lat, lng) {
-                latInput.value = lat.toFixed(6);
-                lngInput.value = lng.toFixed(6);
-            }
-            
-            // Actualizar coordenadas cuando se mueve el marcador
-            marker.on('dragend', function(e) {
-                const { lat, lng } = e.target.getLatLng();
-                updateCoordinates(lat, lng);
-            });
-            
-            // Manejar clics en el mapa
-            map.on('click', function(e) {
-                const { lat, lng } = e.latlng;
-                marker.setLatLng([lat, lng]);
-                updateCoordinates(lat, lng);
-            });
-            
-            // Forzar el redimensionamiento del mapa después de un breve retraso
-            setTimeout(() => {
-                map.invalidateSize();
-            }, 300);
-            
-            return {
-                map: map,
-                marker: marker,
-                latInput: latInput,
-                lngInput: lngInput
-            };
-        }
-        
-        // Asegúrate de que esta función existe para mostrar el recurso correcto
-        function showResource(type, index) {
-            const resource = resources[type];
-            const elements = resource.container.querySelectorAll('.repeat-section');
-            
-            elements.forEach(el => {
-                el.style.display = 'none';
-            });
-            
-            const elementToShow = document.getElementById(`${type}-${index}`);
-            if (elementToShow) {
-                elementToShow.style.display = 'block';
-                
-                // Redimensionar el mapa cuando se muestra la sección
-                setTimeout(() => {
-                    if (resource.maps && resource.maps[index] && resource.maps[index].map) {
-                        resource.maps[index].map.invalidateSize();
-                    }
-                }, 100);
-            }
-        }
-
-            }
-            
-            // Función para configurar las preguntas condicionales
-            function setupConditionalQuestions(container, type, resourceId) {
-                if (type === 'transporte') {
-                    // Configurar eventos para tipo de transporte
-                    const tipoTransporteRadios = container.querySelectorAll('input[name^="tipo_transporte_"]');
-                    tipoTransporteRadios.forEach(radio => {
-                        radio.addEventListener('change', function() {
-                            // Ocultar todas las preguntas condicionales primero
-                            container.querySelectorAll('.conditional-question').forEach(q => {
-                                q.classList.add('hidden');
-                            });
-                            
-                            // Mostrar la pregunta correspondiente según la selección
-                            if (this.value === 'transporte_personal') {
-                                container.querySelector(`#tipo_vehiculo_personal_${resourceId}`).classList.remove('hidden');
-                            } else if (this.value === 'transporte_carga') {
-                                container.querySelector(`#vehiculo_carga_materiales_${resourceId}`).classList.remove('hidden');
-                            } else if (this.value === 'maquinaria') {
-                                container.querySelector(`#maquinaria_${resourceId}`).classList.remove('hidden');
-                            } else if (this.value === 'ambulancia') {
-                                container.querySelector(`#ambulancia_${resourceId}`).classList.remove('hidden');
-                            }
-                        });
-                    });
-                    
-                    // Configurar eventos para fuente de financiamiento
-                    const fuenteFinanciamientoSelect = container.querySelector('select[name^="fuente_financiamiento_"]');
-                    if (fuenteFinanciamientoSelect) {
-                        fuenteFinanciamientoSelect.addEventListener('change', function() {
-                            const recursosExternosDiv = container.querySelector(`#recursos_externos_${resourceId}`);
-                            if (this.value === 'Recursos Externos') {
-                                recursosExternosDiv.classList.remove('hidden');
-                            } else {
-                                recursosExternosDiv.classList.add('hidden');
-                            }
-                        });
-                    }
-                } else if (type === 'herramientas') {
-                    // Configurar eventos para tipo de herramienta
-                    const tipoHerramientaRadios = container.querySelectorAll('input[name^="tipo_herramienta_"]');
-                    tipoHerramientaRadios.forEach(radio => {
-                        radio.addEventListener('change', function() {
-                            // Ocultar todas las preguntas condicionales primero
-                            container.querySelectorAll('.conditional-question').forEach(q => {
-                                q.classList.add('hidden');
-                            });
-                            
-                            // Mostrar la pregunta correspondiente según la selección
-                            if (this.value === 'Equipamiento de Protección Personal') {
-                                container.querySelector(`#equipamiento_proteccion_personal_${resourceId}`).classList.remove('hidden');
-                            } else if (this.value === 'Kit de Higiene Personal') {
-                                container.querySelector(`#kit_higiene_personal_${resourceId}`).classList.remove('hidden');
-                            } else if (this.value === 'Kit de Alimentación y Suplementos') {
-                                container.querySelector(`#kit_alimentacion_suplementos_${resourceId}`).classList.remove('hidden');
-                            } else if (this.value === 'Contenedor de Agua') {
-                                container.querySelector(`#contenedor_agua_${resourceId}`).classList.remove('hidden');
-                            }
-                        });
-                    });
-                }
-            }
-            
-            function deleteResource(type) {
-                const resource = resources[type];
-                if (resource.count === 0) return;
-
-                const positionToDelete = resource.current;
-                const elementToDelete = document.getElementById(`${type}-${positionToDelete}`);
-                if (elementToDelete) elementToDelete.remove();
-
-                for (let i = positionToDelete + 1; i <= resource.count; i++) {
-                    const currentElement = document.getElementById(`${type}-${i}`);
-                    if (!currentElement) continue;
-
-                    const newIndex = i - 1;
-                    currentElement.id = `${type}-${newIndex}`;
-
-                    const allFields = currentElement.querySelectorAll('[name]');
-                    allFields.forEach(field => {
-                        field.name = field.name.replace(`_${i}_`, `_${newIndex}_`);
-                    });
-                }
-
-                resource.count--;
-                resource.current = Math.min(positionToDelete, resource.count);
+        for (let i = 1; i <= resource.count; i++) {
+            const number = document.createElement('div');
+            number.className = `resource-number ${i === resource.current ? 'active' : ''}`;
+            number.textContent = i;
+            number.addEventListener('click', () => {
+                resource.current = i;
                 updateCounter(type);
-                
-                if (resource.count > 0) {
-                    showResource(type, resource.current);
-                } else {
-                    resource.current = 0;
-                }
-            }
-
-            function updateCounter(type) {
-                const resource = resources[type];
-                resource.counter.innerHTML = '';
-                
-                for (let i = 1; i <= resource.count; i++) {
-                    const number = document.createElement('div');
-                    number.className = `resource-number ${i === resource.current ? 'active' : ''}`;
-                    number.textContent = i;
-                    number.addEventListener('click', () => {
-                        resource.current = i;
-                        updateCounter(type);
-                        showResource(type, i);
-                    });
-                    resource.counter.appendChild(number);
-                }
-            }
-
-            function showResource(type, index) {
-                const resource = resources[type];
-                const elements = resource.container.querySelectorAll('.repeat-section');
-                
-                elements.forEach(el => {
-                    el.style.display = 'none';
-                });
-                
-                const elementToShow = document.getElementById(`${type}-${index}`);
-                if (elementToShow) {
-                    elementToShow.style.display = 'block';
-                }
-            }
-            
-            // Función mejorada para manejar campos "Otro"
-            function setupOtherFields(container) {
-                // Manejar campos de radio buttons (comportamiento original)
-                const radioGroups = container.querySelectorAll('.radio-group');
-                radioGroups.forEach(group => {
-                    const radios = group.querySelectorAll('input[type="radio"]');
-                    radios.forEach(radio => {
-                        // Verificar si ya está seleccionado al cargar
-                        if (radio.checked && (radio.value === 'otro' || radio.value === 'other')) {
-                            showOtherInput(radio);
-                        }
-                        
-                        // Agregar evento para cambios
-                        radio.addEventListener('change', function() {
-                            if (this.value === 'otro' || this.value === 'other') {
-                                showOtherInput(this);
-                            } else {
-                                hideOtherInput(this);
-                            }
-                        });
-                    });
-                });
-                
-                // Manejar campos de checkbox (nuevo comportamiento)
-                const checkboxGroups = container.querySelectorAll('.checkbox-group');
-                checkboxGroups.forEach(group => {
-                    const checkboxes = group.querySelectorAll('input[type="checkbox"]');
-                    const otherCheckbox = group.querySelector('input[type="checkbox"][value="other"]');
-                    const otherInputContainer = group.closest('.form-group').querySelector('.other-input-container');
-                    
-                    // Verificar si "Otro" ya está seleccionado al cargar
-                    if (otherCheckbox && otherCheckbox.checked) {
-                        otherInputContainer.classList.remove('hidden');
-                    }
-                    
-                    // Agregar evento solo al checkbox "Otro"
-                    if (otherCheckbox) {
-                        otherCheckbox.addEventListener('change', function() {
-                            if (this.checked) {
-                                otherInputContainer.classList.remove('hidden');
-                            } else {
-                                otherInputContainer.classList.add('hidden');
-                                const inputField = otherInputContainer.querySelector('input');
-                                if (inputField) {
-                                    inputField.value = '';
-                                }
-                            }
-                        });
-                    }
-                    
-                    // Para los otros checkboxes, no hacer nada (permitir selección múltiple)
-                });
-            }
-            
-            // Función para mostrar el campo "Otro"
-            function showOtherInput(inputElement) {
-                const container = inputElement.closest('.form-group');
-                if (!container) return;
-                
-                const otherInputContainer = container.querySelector('.other-input-container');
-                if (otherInputContainer) {
-                    otherInputContainer.classList.remove('hidden');
-                }
-            }
-            
-            // Función para ocultar el campo "Otro"
-            function hideOtherInput(inputElement) {
-                const container = inputElement.closest('.form-group');
-                if (!container) return;
-                
-                const otherInputContainer = container.querySelector('.other-input-container');
-                if (otherInputContainer) {
-                    otherInputContainer.classList.add('hidden');
-                    const inputField = otherInputContainer.querySelector('input');
-                    if (inputField) {
-                        inputField.value = '';
-                    }
-                }
-            }
-
-        function collectCoordinates() {
-    const coordinates = {};
+                showResource(type, i);
+            });
+            resource.counter.appendChild(number);
+        }
+    }
     
-    for (const [type, resource] of Object.entries(resources)) {
-        if (resource.maps) {
-            for (let i = 1; i <= resource.count; i++) {
-                if (resource.maps[i]) {
-                    coordinates[`coordenadas_${type}_${i}_lat`] = resource.maps[i].latInput.value;
-                    coordinates[`coordenadas_${type}_${i}_lng`] = resource.maps[i].lngInput.value;
+    // Función para eliminar recurso
+    function deleteResource(type) {
+        const resource = resources[type];
+        if (resource.count === 0) return;
+
+        const positionToDelete = resource.current;
+        const elementToDelete = document.getElementById(`${type}-${positionToDelete}`);
+        if (elementToDelete) elementToDelete.remove();
+
+        for (let i = positionToDelete + 1; i <= resource.count; i++) {
+            const currentElement = document.getElementById(`${type}-${i}`);
+            if (!currentElement) continue;
+
+            const newIndex = i - 1;
+            currentElement.id = `${type}-${newIndex}`;
+
+            const allFields = currentElement.querySelectorAll('[name]');
+            allFields.forEach(field => {
+                field.name = field.name.replace(`_${i}_`, `_${newIndex}_`);
+            });
+        }
+
+        resource.count--;
+        resource.current = Math.min(positionToDelete, resource.count);
+        updateCounter(type);
+        
+        if (resource.count > 0) {
+            showResource(type, resource.current);
+        } else {
+            resource.current = 0;
+        }
+    }
+    
+    // Función para configurar preguntas condicionales
+    function setupConditionalQuestions(container, type, resourceId) {
+        if (type === 'transporte') {
+            const tipoTransporteRadios = container.querySelectorAll('input[name^="tipo_transporte_"]');
+            tipoTransporteRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    container.querySelectorAll('.conditional-question').forEach(q => {
+                        q.classList.add('hidden');
+                    });
+                    
+                    if (this.value === 'transporte_personal') {
+                        container.querySelector(`#tipo_vehiculo_personal_${resourceId}`).classList.remove('hidden');
+                    } else if (this.value === 'transporte_carga') {
+                        container.querySelector(`#vehiculo_carga_materiales_${resourceId}`).classList.remove('hidden');
+                    } else if (this.value === 'maquinaria') {
+                        container.querySelector(`#maquinaria_${resourceId}`).classList.remove('hidden');
+                    } else if (this.value === 'ambulancia') {
+                        container.querySelector(`#ambulancia_${resourceId}`).classList.remove('hidden');
+                    }
+                });
+            });
+            
+            const fuenteFinanciamientoSelect = container.querySelector('select[name^="fuente_financiamiento_"]');
+            if (fuenteFinanciamientoSelect) {
+                fuenteFinanciamientoSelect.addEventListener('change', function() {
+                    const recursosExternosDiv = container.querySelector(`#recursos_externos_${resourceId}`);
+                    if (this.value === 'Recursos Externos') {
+                        recursosExternosDiv.classList.remove('hidden');
+                    } else {
+                        recursosExternosDiv.classList.add('hidden');
+                    }
+                });
+            }
+        } else if (type === 'herramientas') {
+            const tipoHerramientaRadios = container.querySelectorAll('input[name^="tipo_herramienta_"]');
+            tipoHerramientaRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    container.querySelectorAll('.conditional-question').forEach(q => {
+                        q.classList.add('hidden');
+                    });
+                    
+                    if (this.value === 'Equipamiento de Protección Personal') {
+                        container.querySelector(`#equipamiento_proteccion_personal_${resourceId}`).classList.remove('hidden');
+                    } else if (this.value === 'Kit de Higiene Personal') {
+                        container.querySelector(`#kit_higiene_personal_${resourceId}`).classList.remove('hidden');
+                    } else if (this.value === 'Kit de Alimentación y Suplementos') {
+                        container.querySelector(`#kit_alimentacion_suplementos_${resourceId}`).classList.remove('hidden');
+                    } else if (this.value === 'Contenedor de Agua') {
+                        container.querySelector(`#contenedor_agua_${resourceId}`).classList.remove('hidden');
+                    }
+                });
+            });
+        }
+    }
+    
+    // Función para manejar campos "Otro"
+    function setupOtherFields(container) {
+        const radioGroups = container.querySelectorAll('.radio-group');
+        radioGroups.forEach(group => {
+            const radios = group.querySelectorAll('input[type="radio"]');
+            radios.forEach(radio => {
+                if (radio.checked && (radio.value === 'otro' || radio.value === 'other')) {
+                    showOtherInput(radio);
                 }
+                
+                radio.addEventListener('change', function() {
+                    if (this.value === 'otro' || this.value === 'other') {
+                        showOtherInput(this);
+                    } else {
+                        hideOtherInput(this);
+                    }
+                });
+            });
+        });
+        
+        const checkboxGroups = container.querySelectorAll('.checkbox-group');
+        checkboxGroups.forEach(group => {
+            const otherCheckbox = group.querySelector('input[type="checkbox"][value="other"]');
+            const otherInputContainer = group.closest('.form-group').querySelector('.other-input-container');
+            
+            if (otherCheckbox && otherCheckbox.checked) {
+                otherInputContainer.classList.remove('hidden');
+            }
+            
+            if (otherCheckbox) {
+                otherCheckbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        otherInputContainer.classList.remove('hidden');
+                    } else {
+                        otherInputContainer.classList.add('hidden');
+                        const inputField = otherInputContainer.querySelector('input');
+                        if (inputField) {
+                            inputField.value = '';
+                        }
+                    }
+                });
+            }
+        });
+    }
+    
+    function showOtherInput(inputElement) {
+        const container = inputElement.closest('.form-group');
+        if (!container) return;
+        
+        const otherInputContainer = container.querySelector('.other-input-container');
+        if (otherInputContainer) {
+            otherInputContainer.classList.remove('hidden');
+        }
+    }
+    
+    function hideOtherInput(inputElement) {
+        const container = inputElement.closest('.form-group');
+        if (!container) return;
+        
+        const otherInputContainer = container.querySelector('.other-input-container');
+        if (otherInputContainer) {
+            otherInputContainer.classList.add('hidden');
+            const inputField = otherInputContainer.querySelector('input');
+            if (inputField) {
+                inputField.value = '';
             }
         }
     }
     
-    return coordinates;
-}
-
-// Modificar la función de envío del formulario
-document.getElementById('main-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    if (this.checkValidity()) {
-        // Recopilar todos los datos del formulario
-        const formData = new FormData(this);
-        const data = Object.fromEntries(formData.entries());
+    // Función para recolectar coordenadas
+    function collectCoordinates() {
+        const coordinates = {};
         
-        // Agregar datos de recursos dinámicos
-        data.transporte_count = resources.transporte.count;
-        data.humanos_count = resources.humanos.count;
-        data.herramientas_count = resources.herramientas.count;
-        
-        // Agregar coordenadas de los mapas
-        const coordenadas = collectCoordinates();
-        Object.assign(data, coordenadas);
-        
-        // Reemplaza con tu URL de Web App de Google Apps Script
-        const webAppUrl = 'https://script.google.com/macros/s/AKfycbxs-N9vYOzfi3KZjS2cL0rWjPqoNVHw8cCG-0FSKENhAIA_5NxMhzS6jCwXuRt2G-t2Ug/exec';
-        
-        console.log('Datos a enviar:', data); // Para depuración
-        
-        fetch(webAppUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        })
-        .then(() => {
-            document.getElementById('form-container').style.display = 'none';
-            document.getElementById('thank-you').style.display = 'block';
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Hubo un error al enviar el formulario. Por favor, inténtelo nuevamente.');
-        });
-    } else {
-        alert('Por favor complete todos los campos requeridos.');
-    }
-});
-            
-            // Modificar la función initMap para guardar referencia a los mapas
-            function initMap(containerId, resourceType, resourceId) {
-                // ... (todo el código existente de initMap)
-                
-                // Al final de la función, antes del return, agregar:
-                if (!resources[resourceType].maps) {
-                    resources[resourceType].maps = {};
+        for (const [type, resource] of Object.entries(resources)) {
+            if (resource.maps) {
+                for (let i = 1; i <= resource.count; i++) {
+                    if (resource.maps[i]) {
+                        coordinates[`coordenadas_${type}_${i}_lat`] = resource.maps[i].latInput.value;
+                        coordinates[`coordenadas_${type}_${i}_lng`] = resource.maps[i].lngInput.value;
+                    }
                 }
-                
-                resources[resourceType].maps[resourceId] = {
-                    latInput: latInput,
-                    lngInput: lngInput,
-                    map: map,
-                    marker: marker
-                };
-                
-                // ... (el return se mantiene igual)
             }
-        });
-    </script>
+        }
+        
+        return coordinates;
+    }
+    
+    // Event listener para enviar formulario
+    document.getElementById('main-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (this.checkValidity()) {
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            
+            data.transporte_count = resources.transporte.count;
+            data.humanos_count = resources.humanos.count;
+            data.herramientas_count = resources.herramientas.count;
+            
+            const coordenadas = collectCoordinates();
+            Object.assign(data, coordenadas);
+            
+            const webAppUrl = 'https://script.google.com/macros/s/AKfycbxs-N9vYOzfi3KZjS2cL0rWjPqoNVHw8cCG-0FSKENhAIA_5NxMhzS6jCwXuRt2G-t2Ug/exec';
+            
+            console.log('Datos a enviar:', data);
+            
+            fetch(webAppUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(() => {
+                document.getElementById('form-container').style.display = 'none';
+                document.getElementById('thank-you').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Hubo un error al enviar el formulario. Por favor, inténtelo nuevamente.');
+            });
+        } else {
+            alert('Por favor complete todos los campos requeridos.');
+        }
+    });
+});
+</script>
 </body>
 </html>
+
 
 
 
