@@ -2482,124 +2482,111 @@
         }
             
         document.getElementById('main-form').addEventListener('submit', function(e) {
-            e.preventDefault();
+        e.preventDefault();
+        
+        if (this.checkValidity()) {
+            // Mostrar mensaje de carga y ocultar formulario
+            document.getElementById('form-container').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('error-message').style.display = 'none';
+            document.getElementById('thank-you').style.display = 'none';
             
-            if (this.checkValidity()) {
-                // Mostrar mensaje de carga y ocultar formulario
-                document.getElementById('form-container').style.display = 'none';
-                document.getElementById('thank-you').style.display = 'block';
-                document.getElementById('loading').style.display = 'block';
-                document.getElementById('error-message').style.display = 'none';
+            // Recopilar todos los datos del formulario
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Agregar campos según el tipo de recurso
+            const tipoRecurso = data.tipo_recurso;
+            let resourceCount = 0;
+            
+            if (tipoRecurso === 'Medios de Transporte') {
+                resourceCount = resources.transporte.count;
+                data.num_transporte = resourceCount;
+            } else if (tipoRecurso === 'Recursos Humanos') {
+                resourceCount = resources.humanos.count;
+                data.num_humanos = resourceCount;
+            } else if (tipoRecurso === 'Herramientas o Elementos Auxiliares') {
+                resourceCount = resources.herramientas.count;
+                data.num_herramientas = resourceCount;
+            }
+            
+            // Agregar datos de cada recurso
+            for (let i = 1; i <= resourceCount; i++) {
+                // Obtener todos los campos para este recurso
+                const resourceFields = document.querySelectorAll(`[name$="_${i}"]`);
                 
-                // Recopilar todos los datos del formulario manualmente
-                const data = {};
-                
-                // Agregar campos básicos
-                const basicFields = [
-                    'region', 'fecha_hora', 'rut', 'doc', 'comuna', 
-                    'nombre', 'cargo', 'telefono', 'email', 'tipo_recurso'
-                ];
-                
-                basicFields.forEach(field => {
-                    const element = document.querySelector(`[name="${field}"]`);
-                    if (element) data[field] = element.value;
-                });
-                
-                // Agregar campos según el tipo de recurso
-                const tipoRecurso = data.tipo_recurso;
-                let resourceType = '';
-                let resourceCount = 0;
-                
-                if (tipoRecurso === 'Medios de Transporte') {
-                    resourceType = 'transporte';
-                    resourceCount = resources.transporte.count;
-                    data.num_transporte = resourceCount;
-                } else if (tipoRecurso === 'Recursos Humanos') {
-                    resourceType = 'humano';
-                    resourceCount = resources.humanos.count;
-                    data.num_humanos = resourceCount;
-                } else if (tipoRecurso === 'Herramientas o Elementos Auxiliares') {
-                    resourceType = 'herramienta';
-                    resourceCount = resources.herramientas.count;
-                    data.num_herramientas = resourceCount;
-                }
-                
-                // Agregar datos de cada recurso
-                for (let i = 1; i <= resourceCount; i++) {
-                    // Obtener todos los campos para este recurso
-                    const resourceFields = document.querySelectorAll(`[name$="_${i}"]`);
+                resourceFields.forEach(field => {
+                    const fieldName = field.name;
                     
-                    resourceFields.forEach(field => {
-                        const fieldName = field.name;
-                        
-                        if (field.type === 'checkbox') {
-                            // Manejar checkboxes
-                            if (field.checked) {
-                                if (!data[fieldName]) {
-                                    data[fieldName] = field.value;
-                                } else if (Array.isArray(data[fieldName])) {
-                                    data[fieldName].push(field.value);
-                                } else {
-                                    data[fieldName] = [data[fieldName], field.value];
-                                }
-                            }
-                        } else if (field.type === 'radio') {
-                            // Manejar radios (solo el seleccionado)
-                            if (field.checked) {
+                    if (field.type === 'checkbox') {
+                        // Manejar checkboxes - solo agregar si están checked
+                        if (field.checked) {
+                            if (!data[fieldName]) {
                                 data[fieldName] = field.value;
+                            } else if (Array.isArray(data[fieldName])) {
+                                data[fieldName].push(field.value);
+                            } else {
+                                data[fieldName] = [data[fieldName], field.value];
                             }
-                        } else {
-                            // Manejar otros tipos de campos
+                        }
+                    } else if (field.type === 'radio') {
+                        // Manejar radios - solo agregar si están checked
+                        if (field.checked) {
                             data[fieldName] = field.value;
                         }
-                    });
-                }
-                
-                console.log('Datos a enviar:', data);
-                
-                // Enviar datos a Google Apps Script usando fetch
-                fetch('https://script.google.com/macros/s/AKfycbwoDRRl2lQrpqq0EhQyQJRVF7KQ9Rbla4Bmvg6MwTDeenXg3HDZHUh4anV97XpiAuUezw/exec', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: new URLSearchParams(data).toString()
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Error en la respuesta del servidor');
+                    } else {
+                        // Manejar otros tipos de campos
+                        data[fieldName] = field.value;
                     }
-                    return response.text();
-                })
-                .then(result => {
-                    console.log('Éxito:', result);
-                    document.getElementById('loading').style.display = 'none';
-                    // El mensaje de agradecimiento ya está visible
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('error-message').style.display = 'block';
-                    document.getElementById('form-container').style.display = 'block';
-                    document.getElementById('thank-you').style.display = 'none';
-                    alert('Hubo un error al enviar el formulario: ' + error.message);
                 });
-            } else {
-                alert('Por favor complete todos los campos requeridos.');
             }
-        });
-        
-        // Función auxiliar para agregar campos ocultos
-        function addHiddenField(name, value) {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = name;
-            input.value = value;
-            document.getElementById('main-form').appendChild(input);
+            
+            console.log('Datos a enviar:', data);
+            
+            // Enviar datos a Google Apps Script usando fetch
+            fetch('https://script.google.com/macros/s/AKfycbwXIEzf5VNcubDCmylCfZMIFZqUYxBBgVi8Mnp0K1vmyup49q8_AeidXcDWfZU-JlyRug/exec', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return response.json();
+            })
+            .then(result => {
+                console.log('Éxito:', result);
+                document.getElementById('loading').style.display = 'none';
+                
+                if (result.result === 'success') {
+                    document.getElementById('thank-you').style.display = 'block';
+                } else {
+                    throw new Error(result.error || 'Error desconocido');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('form-container').style.display = 'block';
+                document.getElementById('thank-you').style.display = 'none';
+                
+                // Mostrar mensaje de error específico
+                const errorElement = document.getElementById('error-message');
+                errorElement.innerHTML = `<p>Hubo un error al enviar el formulario: ${error.message}</p>
+                                         <p>Por favor, inténtelo de nuevo.</p>`;
+            });
+        } else {
+            alert('Por favor complete todos los campos requeridos.');
         }
     });
+});
 </script>
 </body>
 </html>
+
 
 
