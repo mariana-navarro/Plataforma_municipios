@@ -850,18 +850,18 @@
             </form>
         </div>
 
-        <div id="loading" class="form-message form-loading hidden">
+        <div id="loading" class="form-message form-loading">
             <p>Enviando datos, por favor espere...</p>
         </div>
         
-        <div id="error-message" class="form-message form-error hidden">
-            <p>Hubo un error al enviar el formulario. Por favor, inténtelo de nuevo.</p>
+        <div id="error-message" class="form-message form-error">
+            <p>Ha ocurrido un error al enviar el formulario. Por favor, inténtelo de nuevo.</p>
         </div>
                 
         <div id="thank-you" class="thank-you">
             <img src="thankYouScreen.svg" alt="Icono de marca de verificación verde">
-            <h2>Gracias.</h2>
-            <p>Su respuesta se ha enviado correctamente.</p>
+            <h2>¡Formulario enviado con éxito!</h2>
+            <p>Los datos han sido guardados correctamente.</p>
         </div>
     </div>
 
@@ -2428,7 +2428,20 @@
                 }
             }
         }
-        
+
+        // Función para mostrar un mensaje y ocultar los demás
+        function showMessage(messageId) {
+                // Ocultar todos los mensajes primero
+                document.querySelectorAll('.form-message, .thank-you').forEach(element => {
+                    element.style.display = 'none';
+                });
+                
+                // Mostrar el mensaje solicitado
+                if (messageId) {
+                    document.getElementById(messageId).style.display = 'block';
+                }
+        }
+            
         document.getElementById('main-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -2549,3 +2562,4 @@
 </script>
 </body>
 </html>
+
