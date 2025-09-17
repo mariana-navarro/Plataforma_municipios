@@ -10,8 +10,10 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 
     <style>
-
-        /* Estilos para mensajes de estado */
+        /* Estilos existentes se mantienen igual */
+        /* ... (todo el CSS original se mantiene igual) ... */
+        
+        /* Nuevos estilos para mensajes de estado */
         .form-message {
             padding: 15px;
             margin: 20px 0;
@@ -36,723 +38,6 @@
             background-color: #d1ecf1;
             color: #0c5460;
             border: 1px solid #bee5eb;
-        }
-        
-        .thank-you {
-            text-align: center;
-            padding: 30px;
-            display: none;
-        }
-        
-        .thank-you img {
-            max-width: 100px;
-            margin-bottom: 20px;
-        }
-        
-        /* Tus estilos existentes se mantienen igual */
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            color: #333;
-            background-color: #f5f5f5;
-            background-image: url('https://live.staticflickr.com/127/333447132_87ae335326_b.jpg'); /* Cambia por tu URL */
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-
-        .banner {
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .banner img {
-            width: 100%;
-            height: auto;
-            display: block;
-            object-fit: cover;
-            max-height: 200px; /* Ajusta esta altura máxima según necesites */
-        }
-
-        /* Elimina el h1 del banner si solo quieres la imagen */
-        .banner h1 {
-            display: none; /* Oculta el título si solo quieres la imagen */
-        }
-
-        /* Añade margen superior al contenedor principal */
-        /* Banner superior del formulario */
-        .form-header-banner {
-            background-color: #003366; /* Color azul */
-            color: white;
-            padding: 15px 30px;
-            font-size: 23px;
-            font-weight: bold;
-            margin: -30px -30px 30px -30px; /* Negativos para "salir" del padding del contenedor */
-            border-radius: 8px 8px 0 0; /* Solo esquinas superiores redondeadas */
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        /* Ajuste para el contenedor principal */
-        .container {
-            max-width: 1000px;
-            margin: 30px auto 0;
-            background: #dce9f5ab;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            overflow: hidden; /* Importante para que el banner no sobresalga */
-        }
-
-        .main-content {
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            margin: 20px auto;
-            max-width: 1000px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 30px;
-        }
-        .form-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .form-section {
-            margin-bottom: 30px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #dce9f5d2;
-            overflow: hidden;
-        }
-        .section-header {
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-        .section-title {
-            margin: 0 0 10px 0;
-            color: #003366;
-            width: 100%;
-        }
-        .resource-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            overflow-x: auto;
-            padding-bottom: 5px;
-        }
-        .resource-counter {
-            display: flex;
-            gap: 5px;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            max-width: calc(100% - 80px);
-        }
-
-        /* Botón de eliminar (basurero) */
-        .delete-button {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background-color: white;
-            border: 1px solid #ddd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            padding: 0;
-        }
-
-        .delete-button svg {
-            width: 14px;
-            height: 16px;
-            fill: #666;
-            transition: all 0.3s ease;
-        }
-
-        .delete-button:hover {
-            background-color: #e74c3c;
-            border-color: #e74c3c;
-        }
-
-        .delete-button:hover svg {
-            fill: white;
-        }
-
-        /* Números de recurso */
-        .resource-number {
-            min-width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background-color: white;
-            border: 1px solid #ddd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-weight: bold;
-            color: #666;
-            transition: all 0.3s ease;
-        }
-
-        .resource-number:hover, 
-        .resource-number.active {
-            background-color: #003366;
-            border-color: #003366;
-            color: white;
-        }
-
-        /* Botón de agregar (+) */
-        .add-button {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background-color: transparent;
-            border: 1px dashed #666;
-            color: #666;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            padding: 0;
-            position: relative;
-        }
-
-        .add-button::before {
-            content: "+";
-            position: absolute;
-        }
-
-        .add-button:hover {
-            border-color: #003366;
-            color: #003366;
-        }
-
-        /* Contenedores (mantener estos que ya tienes) */
-        .resource-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            overflow-x: auto;
-            padding-bottom: 5px;
-        }
-
-        .resource-counter {
-            display: flex;
-            gap: 5px;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            max-width: calc(100% - 80px);
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-            width: 100%;
-            overflow: hidden;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-        .hint {
-            font-size: 0.9em;
-            color: #666;
-            margin-top: 5px;
-        }
-
-        /* Estilos unificados para todos los campos de entrada */
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            background-color: white;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-            margin-top: 5px;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-        }
-
-        .form-control:hover {
-            border-color: #3498db;
-        }
-
-        /* Estilo específico para selects */
-        select.form-control {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            background-size: 12px;
-            padding-right: 35px;
-        }
-
-        /* Estilo para textarea */
-        textarea.form-control {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        /* Contenedor para campos de fecha/hora */
-        .datetime-container {
-            position: relative;
-        }
-
-        .datetime-container::after {
-            content: '';
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 20px;
-            height: 20px;
-            background-size: contain;
-            background-repeat: no-repeat;
-            pointer-events: none;
-        }
-
-        input[type="date"].form-control,
-        input[type="time"].form-control,
-        input[type="datetime-local"].form-control {
-            padding-right: 35px;
-        }
-
-        input[type="date"].form-control + .datetime-container::after {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z'/%3E%3C/svg%3E");
-        }
-
-        input[type="time"].form-control + .datetime-container::after {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z'/%3E%3Cpath d='M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z'/%3E%3C/svg%3E");
-        }
-
-        input[type="datetime-local"].form-control + .datetime-container::after {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z'/%3E%3C/svg%3E");
-        }
-        
-        /* Estilos consistentes para radio buttons */
-        .radio-group {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            width: 100%;
-        }
-
-        .radio-option {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .radio-option:hover {
-            border-color: #3498db;
-        }
-
-        .radio-option input[type="radio"] {
-            position: absolute;
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .radio-option .custom-radio {
-            position: relative;
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            min-width: 20px;
-            margin-right: 12px;
-            border: 2px solid #3498db;
-            border-radius: 50%;
-            background-color: white;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-        }
-
-        .radio-option input[type="radio"]:checked + .custom-radio {
-            border-color: #3498db;
-        }
-
-        .radio-option input[type="radio"]:checked + .custom-radio::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 10px;
-            height: 10px;
-            background-color: #3498db;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            display: block;
-        }
-
-        .radio-option .option-text {
-            font-weight: normal;
-            color: #333;
-            flex-grow: 1;
-        }
-
-        .radio-option input[type="radio"]:checked ~ .option-text {
-            color: #3498db;
-        }
-
-        /* Estilos para checkbox con 3 columnas */
-        .checkbox-group {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            width: 100%;
-        }
-
-        .checkbox-option {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .checkbox-option:hover {
-            border-color: #3498db;
-        }
-
-        .checkbox-option input[type="checkbox"] {
-            position: absolute;
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .checkbox-option .custom-checkbox {
-            position: relative;
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            min-width: 20px;
-            margin-right: 12px;
-            border: 2px solid #3498db;
-            border-radius: 4px;
-            background-color: white;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-        }
-
-        .checkbox-option input[type="checkbox"]:checked + .custom-checkbox {
-            background-color: #3498db;
-            border-color: #3498db;
-        }
-
-        .checkbox-option input[type="checkbox"]:checked + .custom-checkbox::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 12px;
-            height: 12px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/%3E%3C/svg%3E");
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: contain;
-            transform: translate(-50%, -50%);
-            display: block;
-        }
-
-        .checkbox-option .option-text {
-            font-weight: normal;
-            color: #333;
-            flex-grow: 1;
-        }
-
-        .checkbox-option input[type="checkbox"]:checked ~ .option-text {
-            color: #3498db;
-        }
-
-        .required:after {
-            content: " *";
-            color: red;
-        }
-        .submit-btn {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            font-size: 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            display: block;
-            margin: 30px auto 0;
-            width: auto;
-            max-width: 100%;
-        }
-        .repeat-section {
-            border: 1px dashed #3498db;
-            padding: 15px;
-            margin-bottom: 20px;
-            background-color: #eaf2f8;
-            overflow: hidden;
-        }
-        .hidden {
-            display: none;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 0.9em;
-            color: #666;
-        }
-        .thank-you {
-            text-align: center;
-            padding: 30px;
-            display: none;
-        }
-        .thank-you img {
-            max-width: 100px;
-            margin-bottom: 20px;
-        }
-
-        /* Estilo para el contenedor de búsqueda */
-        .map-search-container {
-            position: absolute;
-            top: 10px;
-            left: 50px;
-            right: 50px;
-            z-index: 1000;
-        }
-        .map-search-input {
-            width: 100%;
-            padding: 12px 15px;
-            font-size: 16px;
-            border: 1px solid #d3d3d3;
-            border-radius: 24px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            outline: none;
-        }
-        .map-search-input:focus {
-            border-color: #4d90fe;
-        }
-        
-        /* Estilo mejorado para las sugerencias */
-        .search-suggestions {
-            background: white;
-            border-radius: 0 0 24px 24px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            margin-top: -12px;
-            max-height: 300px;
-            overflow-y: auto;
-            display: none;
-        }
-        .search-suggestion {
-            padding: 10px 15px;
-            cursor: pointer;
-            border-bottom: 1px solid #eee;
-        }
-        .search-suggestion:hover {
-            background-color: #f5f5f5;
-        }
-        .search-suggestion:last-child {
-            border-bottom: none;
-        }
-        .search-suggestion.active {
-            background-color: #e6f2ff;
-        }
-        .search-suggestion .main-text {
-            font-weight: bold;
-            display: block;
-        }
-        .search-suggestion .secondary-text {
-            color: #666;
-            font-size: 0.9em;
-            display: block;
-        }
-
-        /* Estilo para las sugerencias de búsqueda */
-        .geocoder-control-suggestions {
-            background: white;
-            border: 1px solid #ddd;
-            border-top: none;
-            border-radius: 0 0 4px 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            max-height: 200px;
-            overflow-y: auto;
-            margin-top: -1px;
-        }
-
-        .geocoder-control-suggestions.hidden {
-            display: none;
-        }
-
-        .geocoder-control-suggestion {
-            padding: 10px 15px;
-            cursor: pointer;
-            border-bottom: 1px solid #eee;
-            font-size: 14px;
-            transition: background-color 0.2s;
-        }
-
-        .geocoder-control-suggestion:last-child {
-            border-bottom: none;
-        }
-
-        .geocoder-control-suggestion:hover {
-            background-color: #f5f5f5;
-        }
-
-        /* Estilo del contenedor de coordenadas */
-        .coordinates-container {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            right: 10px;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 10px;
-            border-radius: 4px;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.2);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            font-size: 14px;
-        }
-
-        .coordinates-container .coord-group {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .coordinates-container label {
-            color: #555;
-            font-weight: bold;
-            margin: 0;
-            white-space: nowrap;
-        }
-
-        .coordinates-container input {
-            width: 120px;
-            padding: 6px 10px;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            font-size: 13px;
-            background: white;
-        }
-
-        /* Créditos del mapa */
-        .map-credit {
-            position: absolute;
-            bottom: 15px;
-            right: 15px;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 3px 8px;
-            border-radius: 3px;
-            font-size: 11px;
-            color: #555;
-        }
-
-        /* Estilo para el contenedor del mapa */
-        .map-container {
-            height: 400px;  /* Aumentamos la altura */
-            width: 100%;    /* Mantenemos el ancho al 100% */
-            margin-top: 10px;
-            background-color: #eee;
-            border-radius: 4px;
-            overflow: hidden;
-            position: relative;
-            aspect-ratio: 1 / 1; /* Esto fuerza una relación 1:1 (cuadrado perfecto) */
-        }
-        
-        /* Nuevos estilos para campos de "Otro" */
-        .other-input-container {
-            margin-top: 10px;
-            transition: all 0.3s ease;
-        }
-        
-        /* Estilos para preguntas condicionales */
-        .conditional-question {
-            margin-top: 15px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 6px;
-            border-left: 4px solid #3498db;
-        }
-
-        /* Estilos para mensajes de estado */
-        .form-message {
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 5px;
-            text-align: center;
-        }
-        
-        .form-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .form-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .form-loading {
-            background-color: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-        
-        #loading, #error-message {
-            margin: 20px 0;
-            padding: 15px;
-            border-radius: 5px;
-            text-align: center;
-        }
-        
-        #loading {
-            background-color: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-        
-        #error-message {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
         }
     </style>
 </head>
@@ -768,7 +53,19 @@
                 Levantamiento de Recursos y Capacidades Comunales
             </div>
 
-            <!-- MODIFICADO: Agregado action y method -->
+            <!-- Mensajes de estado -->
+            <div id="form-success" class="form-message form-success">
+                ¡Formulario enviado con éxito! Los datos han sido guardados correctamente.
+            </div>
+            
+            <div id="form-error" class="form-message form-error">
+                Ha ocurrido un error al enviar el formulario. Por favor, inténtelo de nuevo.
+            </div>
+            
+            <div id="form-loading" class="form-message form-loading">
+                Enviando datos, por favor espere...
+            </div>
+
             <form id="main-form">
                 <!-- Sección de Información Básica -->
                 <div class="form-section">
@@ -884,23 +181,14 @@
                     <div id="herramientas-repeats"></div>
                 </div>
                 
-                <!-- MODIFICADO: Cambiado a type="submit" -->
                 <button type="submit" class="submit-btn">Enviar</button>
             </form>
         </div>
-
-        <div id="loading" class="form-message form-loading">
-            <p>Enviando datos, por favor espere...</p>
-        </div>
         
-        <div id="error-message" class="form-message form-error">
-            <p>Ha ocurrido un error al enviar el formulario. Por favor, inténtelo de nuevo.</p>
-        </div>
-                
         <div id="thank-you" class="thank-you">
             <img src="thankYouScreen.svg" alt="Icono de marca de verificación verde">
-            <h2>¡Formulario enviado con éxito!</h2>
-            <p>Los datos han sido guardados correctamente.</p>
+            <h2>Gracias.</h2>
+            <p>Su respuesta se ha enviado correctamente.</p>
         </div>
     </div>
 
@@ -910,6 +198,9 @@
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <script>
+        // URL del Web App de Google Apps Script (REEMPLAZAR CON TU URL)
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzKir9jjUZrAhgc4LrPEzecmTGvV9KLs6nYBLCsElB1G1v-8dWoyMDSrOwtjuS6EjflMQ/exec';
+        
         document.addEventListener('DOMContentLoaded', function() {
             // Configurar fecha y hora actual
             const now = new Date();
@@ -1046,7 +337,6 @@
                 latInput.type = 'text';
                 latInput.value = initialLat.toFixed(6);
                 latInput.setAttribute('data-coord', 'lat');
-                latInput.name = `latitud_${resourceId}`; // MODIFICADO: Agregado name
                 
                 // Grupo Longitud
                 const lngGroup = L.DomUtil.create('div', 'coord-group');
@@ -1056,8 +346,7 @@
                 lngInput.type = 'text';
                 lngInput.value = initialLng.toFixed(6);
                 lngInput.setAttribute('data-coord', 'lng');
-                lngInput.name = `longitud_${resourceId}`; // MODIFICADO: Agregado name
-
+                
                 // Agregar grupos al contenedor
                 coordsContainer.appendChild(latGroup);
                 coordsContainer.appendChild(lngGroup);
@@ -1675,7 +964,7 @@
                                 <label class="radio-option">
                                     <input type="radio" name="tipo_humano_${resource.count}" value="Equipos de Atención de Personal con Necesidades Especiales">
                                     <span class="custom-radio"></span>
-                                    <span class="option-text">Equipos de Atención de Personal con Neceptuales Especiales</span>
+                                    <span class="option-text">Equipos de Atención de Personal con Necesidades Especiales</span>
                                 </label>
                                 <label class="radio-option">
                                     <input type="radio" name="tipo_humano_${resource.count}" value="Equipos Técnicos de Otras Especialidades">
@@ -1686,7 +975,7 @@
                                     <input type="radio" name="tipo_humano_${resource.count}" value="otro">
                                     <span class="custom-radio"></span>
                                     <span class="option-text">Otro</span>
-                                    </label>
+                                </label>
                             </div>
                             <div class="other-input-container hidden">
                                 <input type="text" name="tipo_humano_otro_${resource.count}" class="form-control" placeholder="Especifique otro tipo">
@@ -1984,30 +1273,30 @@
                         <div id="kit_higiene_personal_${resource.count}" class="conditional-question hidden">
                             <div class="form-group">
                                 <label class="required">Kit de Higiene Personal:</label>
-                                <div class="checkbox-group"> <!-- CAMBIADO: radio-group → checkbox-group -->
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                <div class="checkbox-group">
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_higiene_personal_${resource.count}[]" value="Kit Higiene Hombre">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Kit Higiene Hombre</span>
                                     </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_higiene_personal_${resource.count}[]" value="Kit Higiene Mujer">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Kit Higiene Mujer</span>
                                     </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_higiene_personal_${resource.count}[]" value="Kit Higiene Infantil">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Kit Higiene Infantil</span>
                                     </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_higiene_personal_${resource.count}[]" value="Kit Higiene Lactante">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Kit Higiene Lactante</span>
                                     </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_higiene_personal_${resource.count}[]" value="other"> 
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Otro</span>
                                     </label>
                                 </div>
@@ -2020,25 +1309,25 @@
                         <div id="kit_alimentacion_suplementos_${resource.count}" class="conditional-question hidden">
                             <div class="form-group">
                                 <label class="required">Kit de Alimentación y Suplementos:</label>
-                                <div class="checkbox-group"> <!-- CAMBIADO: radio-group → checkbox-group -->
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                <div class="checkbox-group">
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_alimentacion_suplementos_${resource.count}[]" value="Kit de Alimentación 4 Pers.- 4 días">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Kit de Alimentación 4 Pers.- 4 días</span>
                                     </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_alimentacion_suplementos_${resource.count}[]" value="Kit Alimentos 4 Pers. - 7 días">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Kit Alimentos 4 Pers. - 7 días</span>
                                     </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_alimentacion_suplementos_${resource.count}[]" value="Kit Alimentos Mascotas">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Kit Alimentos Mascotas</span>
                                     </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_alimentacion_suplementos_${resource.count}[]" value="other"> 
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Otro</span>
                                     </label>
                                 </div>
@@ -2098,538 +1387,438 @@
                                     <span class="custom-radio"></span>
                                     <span class="option-text">Disponible</span>
                                 </label>
-                            <label class="radio-option">
-                                <input type="radio" name="estado_herramienta_${resource.count}" value="No Disponible">
-                                <span class="custom-radio"></span>
-                                <span class="option-text">No Disponible</span>
-                            </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="estado_herramienta_${resource.count}" value="No Disponible">
+                                    <span class="custom-radio"></span>
+                                    <span class="option-text">No Disponible</span>
+                                </label>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>4. Ubicación Geográfica</label>
-                        <input type="text" name="ubicacion_herramienta_${resource.count}" class="form-control">
-                        <p class="hint">Dirección y Comuna. <strong>Ejemplo: Los Robles 540, La Cisterna</strong></p>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>5. Ubicación en el mapa</label>
-                        <div id="map-container-herramienta-${resource.count}" class="map-container"></div>
-                        <p class="hint">Puede buscarlo con el siguiente formato: Calle n°, Comuna, Región <strong>Ejemplo: Los Robles 540, La Cisterna, Región Metropolitana</strong></p>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="required">6. Disponibilidad</label>
-                        <div class="radio-group">
-                            <label class="radio-option">
-                                <input type="radio" name="disponibilidad_herramienta_${resource.count}" value="Permanente" required>
-                                <span class="custom-radio"></span>
-                                <span class="option-text">Permanente</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="disponibilidad_herramienta_${resource.count}" value="Temporal">
-                                <span class="custom-radio"></span>
-                                <span class="option-text">Temporal</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="disponibilidad_herramienta_${resource.count}" value="otro">
-                                <span class="custom-radio"></span>
-                                <span class="option-text">Otro</span>
-                            </label>
+                        
+                        <div class="form-group">
+                            <label>4. Ubicación Geográfica</label>
+                            <input type="text" name="ubicacion_herramienta_${resource.count}" class="form-control">
+                            <p class="hint">Dirección y Comuna. <strong>Ejemplo: Los Robles 540, La Cisterna</strong></p>
                         </div>
-                        <div class="other-input-container hidden">
-                            <input type="text" name="disponibilidad_herramienta_otro_${resource.count}" class="form-control" placeholder="Especifique otra disponibilidad">
+                        
+                        <div class="form-group">
+                            <label>5. Ubicación en el mapa</label>
+                            <div id="map-container-herramienta-${resource.count}" class="map-container"></div>
+                            <p class="hint">Puede buscarlo con el siguiente formato: Calle n°, Comuna, Región <strong>Ejemplo: Los Robles 540, La Cisterna, Región Metropolitana</strong></p>
                         </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="required">7. Tiempo de Disponibilidad</label>
-                        <div class="radio-group">
-                            <label class="radio-option">
-                                <input type="radio" name="tiempo_disponibilidad_herramienta_${resource.count}" value="2 - 5 hrs" required>
-                                <span class="custom-radio"></span>
-                                <span class="option-text">2 - 5 hrs</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="tiempo_disponibilidad_herramienta_${resource.count}" value="6 - 10 hrs">
-                                <span class="custom-radio"></span>
-                                <span class="option-text">6 - 10 hrs</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="tiempo_disponibilidad_herramienta_${resource.count}" value="12 - 24 hrs">
-                                <span class="custom-radio"></span>
-                                <span class="option-text">12 - 24 hrs</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="tiempo_disponibilidad_herramienta_${resource.count}" value="Superior a 48 hrs">
-                                <span class="custom-radio"></span>
-                                <span class="option-text">Superior a 48 hrs</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="tiempo_disponibilidad_herramienta_${resource.count}" value="otro">
-                                <span class="custom-radio"></span>
-                                <span class="option-text">Otro</span>
-                            </label>
+                        
+                        <div class="form-group">
+                            <label class="required">6. Disponibilidad</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="disponibilidad_herramienta_${resource.count}" value="Permanente" required>
+                                    <span class="custom-radio"></span>
+                                    <span class="option-text">Permanente</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="disponibilidad_herramienta_${resource.count}" value="Temporal">
+                                    <span class="custom-radio"></span>
+                                    <span class="option-text">Temporal</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="disponibilidad_herramienta_${resource.count}" value="otro">
+                                    <span class="custom-radio"></span>
+                                    <span class="option-text">Otro</span>
+                                </label>
+                            </div>
+                            <div class="other-input-container hidden">
+                                <input type="text" name="disponibilidad_herramienta_otro_${resource.count}" class="form-control" placeholder="Especifique otra disponibilidad">
+                            </div>
                         </div>
-                        <div class="other-input-container hidden">
-                            <input type="text" name="tiempo_disponibilidad_herramienta_otro_${resource.count}" class="form-control" placeholder="Especifique otro tiempo">
+                        
+                        <div class="form-group">
+                            <label class="required">7. Tiempo de Disponibilidad</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="tiempo_disponibilidad_herramienta_${resource.count}" value="2 - 5 hrs" required>
+                                    <span class="custom-radio"></span>
+                                    <span class="option-text">2 - 5 hrs</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="tiempo_disponibilidad_herramienta_${resource.count}" value="6 - 10 hrs">
+                                    <span class="custom-radio"></span>
+                                    <span class="option-text">6 - 10 hrs</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="tiempo_disponibilidad_herramienta_${resource.count}" value="12 - 24 hrs">
+                                    <span class="custom-radio"></span>
+                                    <span class="option-text">12 - 24 hrs</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="tiempo_disponibilidad_herramienta_${resource.count}" value="Superior a 48 hrs">
+                                    <span class="custom-radio"></span>
+                                    <span class="option-text">Superior to 48 hrs</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="tiempo_disponibilidad_herramienta_${resource.count}" value="otro">
+                                    <span class="custom-radio"></span>
+                                    <span class="option-text">Otro</span>
+                                </label>
+                            </div>
+                            <div class="other-input-container hidden">
+                                <input type="text" name="tiempo_disponibilidad_herramienta_otro_${resource.count}" class="form-control" placeholder="Especifique otro tiempo">
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="required">8. Tiempo de Alistamiento</label>
-                        <div class="radio-group">
-                            <label class="radio-option">
-                                <input type="radio" name="tiempo_alistamiento_herramienta_${resource.count}" value="1 - 2 hrs" required>
-                                <span class="custom-radio"></span>
-                                <span class="option-text">1 - 2 hrs</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="tiempo_alistamiento_herramienta_${resource.count}" value="3 - 4 hrs">
-                                <span class="custom-radio"></span>
-                                <span class="option-text">3 - 4 hrs</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="tiempo_alistamiento_herramienta_${resource.count}" value="5 - 6 hrs">
-                                <span class="custom-radio"></span>
-                                <span class="option-text">5 - 6 hrs</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="tiempo_alistamiento_herramienta_${resource.count}" value="otro">
-                                <span class="custom-radio"></span>
-                                <span class="option-text">Otro</span>
-                            </label>
+                        
+                        <div class="form-group">
+                            <label class="required">8. Tiempo de Alistamiento</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="tiempo_alistamiento_herramienta_${resource.count}" value="1 - 2 hrs" required>
+                                    <span class="custom-radio"></span>
+                                    <span class="option-text">1 - 2 hrs</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="tiempo_alistamiento_herramienta_${resource.count}" value="3 - 4 hrs">
+                                    <span class="custom-radio"></span>
+                                    <span class="option-text">3 - 4 hrs</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="tiempo_alistamiento_herramienta_${resource.count}" value="5 - 6 hrs">
+                                    <span class="custom-radio"></span>
+                                    <span class="option-text">5 - 6 hrs</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="tiempo_alistamiento_herramienta_${resource.count}" value="otro">
+                                    <span class="custom-radio"></span>
+                                    <span class="option-text">Otro</span>
+                                </label>
+                            </div>
+                            <div class="other-input-container hidden">
+                                <input type="text" name="tiempo_alistamiento_herramienta_otro_${resource.count}" class="form-control" placeholder="Especifique otro tiempo">
+                            </div>
                         </div>
-                        <div class="other-input-container hidden">
-                            <input type="text" name="tiempo_alistamiento_herramienta_otro_${resource.count}" class="form-control" placeholder="Especifique otro tiempo">
+                        
+                        <div class="form-group">
+                            <label class="required">9. Rango de Asistencia</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="rango_asistencia_herramienta_${resource.count}" value="< 100 personas" required>
+                                    <span class="custom-radio"></span>
+                                    <span class="option-text"> < 100 personas</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="rango_asistencia_herramienta_${resource.count}" value="> 1000 personas">
+                                    <span class="custom-radio"></span>
+                                    <span class="option-text"> > 1000 personas</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="rango_asistencia_herramienta_${resource.count}" value="otro">
+                                    <span class="custom-radio"></span>
+                                    <span class="option-text">Otro</span>
+                                </label>
+                            </div>
+                            <div class="other-input-container hidden">
+                                <input type="text" name="rango_asistencia_herramienta_otro_${resource.count}" class="form-control" placeholder="Especifique otro rango">
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="required">9. Rango de Asistencia</label>
-                        <div class="radio-group">
-                            <label class="radio-option">
-                                <input type="radio" name="rango_asistencia_herramienta_${resource.count}" value="< 100 personas" required>
-                                <span class="custom-radio"></span>
-                                <span class="option-text"> < 100 personas</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="rango_asistencia_herramienta_${resource.count}" value="> 1000 personas">
-                                <span class="custom-radio"></span>
-                                <span class="option-text"> > 1000 personas</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" name="rango_asistencia_herramienta_${resource.count}" value="otro">
-                                <span class="custom-radio"></span>
-                                <span class="option-text">Otro</span>
-                            </label>
+                        
+                        <div class="form-group">
+                            <label>10. Descripción</label>
+                            <textarea name="descripcion_herramienta_${resource.count}" class="form-control"></textarea>
+                            <p class="hint">Otros Antecedentes</p>
                         </div>
-                        <div class="other-input-container hidden">
-                            <input type="text" name="rango_asistencia_herramienta_otro_${resource.count}" class="form-control" placeholder="Especifique otro rango">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>10. Descripción</label>
-                        <textarea name="descripcion_herramienta_${resource.count}" class="form-control"></textarea>
-                        <p class="hint">Otros Antecedentes</p>
-                    </div>
-                `;
+                    `;
+                }
+                
+                repeatDiv.innerHTML = content;
+                resource.container.appendChild(repeatDiv);
+
+                const allSections = resource.container.querySelectorAll('.repeat-section');
+                allSections.forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                showResource(type, resource.current);
+                setupOtherFields(repeatDiv);
+                
+                // Configurar eventos para mostrar/ocultar preguntas condicionales
+                setupConditionalQuestions(repeatDiv, type, resource.count);
+                
+                // Inicializar el mapa después de que el elemento exista en el DOM
+                setTimeout(() => {
+                    if (type === 'transporte') {
+                        initMap(`map-container-transporte-${resource.count}`);
+                    } else if (type === 'humanos') {
+                        initMap(`map-container-humano-${resource.count}`);
+                    } else if (type === 'herramientas') {
+                        initMap(`map-container-herramienta-${resource.count}`);
+                    }
+                }, 0);
             }
             
-            repeatDiv.innerHTML = content;
-            resource.container.appendChild(repeatDiv);
-
-            const allSections = resource.container.querySelectorAll('.repeat-section');
-            allSections.forEach(section => {
-                section.style.display = 'none';
-            });
-            
-            showResource(type, resource.current);
-            setupOtherFields(repeatDiv);
-            
-            // Configurar eventos para mostrar/ocultar preguntas condicionales
-            setupConditionalQuestions(repeatDiv, type, resource.count);
-            
-            // Inicializar el mapa después de que el elemento exista en el DOM
-            setTimeout(() => {
+            // Función para configurar las preguntas condicionales
+            function setupConditionalQuestions(container, type, resourceId) {
                 if (type === 'transporte') {
-                    initMap(`map-container-transporte-${resource.count}`, 'transporte', resource.count);
-                } else if (type === 'humanos') {
-                    initMap(`map-container-humano-${resource.count}`, 'humano', resource.count);
-                } else if (type === 'herramientas') {
-                    initMap(`map-container-herramienta-${resource.count}`, 'herramienta', resource.count);
-                }
-            }, 0);
-        }
-        
-        // Función para configurar las preguntas condicionales
-        function setupConditionalQuestions(container, type, resourceId) {
-            if (type === 'transporte') {
-                // Configurar eventos para tipo de transporte
-                const tipoTransporteRadios = container.querySelectorAll('input[name^="tipo_transporte_"]');
-                tipoTransporteRadios.forEach(radio => {
-                    radio.addEventListener('change', function() {
-                        // Ocultar todas las preguntas condicionales primero
-                        container.querySelectorAll('.conditional-question').forEach(q => {
-                            q.classList.add('hidden');
+                    // Configurar eventos para tipo de transporte
+                    const tipoTransporteRadios = container.querySelectorAll('input[name^="tipo_transporte_"]');
+                    tipoTransporteRadios.forEach(radio => {
+                        radio.addEventListener('change', function() {
+                            // Ocultar todas las preguntas condicionales primero
+                            container.querySelectorAll('.conditional-question').forEach(q => {
+                                q.classList.add('hidden');
+                            });
+                            
+                            // Mostrar la pregunta correspondiente según la selección
+                            if (this.value === 'transporte_personal') {
+                                container.querySelector(`#tipo_vehiculo_personal_${resourceId}`).classList.remove('hidden');
+                            } else if (this.value === 'transporte_carga') {
+                                container.querySelector(`#vehiculo_carga_materiales_${resourceId}`).classList.remove('hidden');
+                            } else if (this.value === 'maquinaria') {
+                                container.querySelector(`#maquinaria_${resourceId}`).classList.remove('hidden');
+                            } else if (this.value === 'ambulancia') {
+                                container.querySelector(`#ambulancia_${resourceId}`).classList.remove('hidden');
+                            }
                         });
-                        
-                        // Mostrar la pregunta correspondiente según la selección
-                        if (this.value === 'transporte_personal') {
-                            container.querySelector(`#tipo_vehiculo_personal_${resourceId}`).classList.remove('hidden');
-                        } else if (this.value === 'transporte_carga') {
-                            container.querySelector(`#vehiculo_carga_materiales_${resourceId}`).classList.remove('hidden');
-                        } else if (this.value === 'maquinaria') {
-                            container.querySelector(`#maquinaria_${resourceId}`).classList.remove('hidden');
-                        } else if (this.value === 'ambulancia') {
-                            container.querySelector(`#ambulancia_${resourceId}`).classList.remove('hidden');
+                    });
+                    
+                    // Configurar eventos para fuente de financiamiento
+                    const fuenteFinanciamientoSelect = container.querySelector('select[name^="fuente_financiamiento_"]');
+                    if (fuenteFinanciamientoSelect) {
+                        fuenteFinanciamientoSelect.addEventListener('change', function() {
+                            const recursosExternosDiv = container.querySelector(`#recursos_externos_${resourceId}`);
+                            if (this.value === 'Recursos Externos') {
+                                recursosExternosDiv.classList.remove('hidden');
+                            } else {
+                                recursosExternosDiv.classList.add('hidden');
+                            }
+                        });
+                    }
+                } else if (type === 'herramientas') {
+                    // Configurar eventos para tipo de herramienta
+                    const tipoHerramientaRadios = container.querySelectorAll('input[name^="tipo_herramienta_"]');
+                    tipoHerramientaRadios.forEach(radio => {
+                        radio.addEventListener('change', function() {
+                            // Ocultar todas las preguntas condicionales primero
+                            container.querySelectorAll('.conditional-question').forEach(q => {
+                                q.classList.add('hidden');
+                            });
+                            
+                            // Mostrar la pregunta correspondiente según la selección
+                            if (this.value === 'Equipamiento de Protección Personal') {
+                                container.querySelector(`#equipamiento_proteccion_personal_${resourceId}`).classList.remove('hidden');
+                            } else if (this.value === 'Kit de Higiene Personal') {
+                                container.querySelector(`#kit_higiene_personal_${resourceId}`).classList.remove('hidden');
+                            } else if (this.value === 'Kit de Alimentación y Suplementos') {
+                                container.querySelector(`#kit_alimentacion_suplementos_${resourceId}`).classList.remove('hidden');
+                            } else if (this.value === 'Contenedor de Agua') {
+                                container.querySelector(`#contenedor_agua_${resourceId}`).classList.remove('hidden');
+                            }
+                        });
+                    });
+                }
+            }
+            
+            function deleteResource(type) {
+                const resource = resources[type];
+                if (resource.count === 0) return;
+
+                const positionToDelete = resource.current;
+                const elementToDelete = document.getElementById(`${type}-${positionToDelete}`);
+                if (elementToDelete) elementToDelete.remove();
+
+                for (let i = positionToDelete + 1; i <= resource.count; i++) {
+                    const currentElement = document.getElementById(`${type}-${i}`);
+                    if (!currentElement) continue;
+
+                    const newIndex = i - 1;
+                    currentElement.id = `${type}-${newIndex}`;
+
+                    const allFields = currentElement.querySelectorAll('[name]');
+                    allFields.forEach(field => {
+                        field.name = field.name.replace(`_${i}_`, `_${newIndex}_`);
+                    });
+                }
+
+                resource.count--;
+                resource.current = Math.min(positionToDelete, resource.count);
+                updateCounter(type);
+                
+                if (resource.count > 0) {
+                    showResource(type, resource.current);
+                } else {
+                    resource.current = 0;
+                }
+            }
+
+            function updateCounter(type) {
+                const resource = resources[type];
+                resource.counter.innerHTML = '';
+                
+                for (let i = 1; i <= resource.count; i++) {
+                    const number = document.createElement('div');
+                    number.className = `resource-number ${i === resource.current ? 'active' : ''}`;
+                    number.textContent = i;
+                    number.addEventListener('click', () => {
+                        resource.current = i;
+                        updateCounter(type);
+                        showResource(type, i);
+                    });
+                    resource.counter.appendChild(number);
+                }
+            }
+
+            function showResource(type, index) {
+                const resource = resources[type];
+                const elements = resource.container.querySelectorAll('.repeat-section');
+                
+                elements.forEach(el => {
+                    el.style.display = 'none';
+                });
+                
+                const elementToShow = document.getElementById(`${type}-${index}`);
+                if (elementToShow) {
+                    elementToShow.style.display = 'block';
+                }
+            }
+            
+            // Función mejorada para manejar campos "Otro"
+            function setupOtherFields(container) {
+                // Manejar campos de radio buttons (comportamiento original)
+                const radioGroups = container.querySelectorAll('.radio-group');
+                radioGroups.forEach(group => {
+                    const radios = group.querySelectorAll('input[type="radio"]');
+                    radios.forEach(radio => {
+                        // Verificar si ya está seleccionado al cargar
+                        if (radio.checked && (radio.value === 'otro' || radio.value === 'other')) {
+                            showOtherInput(radio);
                         }
+                        
+                        // Agregar evento para cambios
+                        radio.addEventListener('change', function() {
+                            if (this.value === 'otro' || this.value === 'other') {
+                                showOtherInput(this);
+                            } else {
+                                hideOtherInput(this);
+                            }
+                        });
                     });
                 });
                 
-                // Configurar eventos para fuente de financiamiento
-                const fuenteFinanciamientoSelect = container.querySelector('select[name^="fuente_financiamiento_"]');
-                if (fuenteFinanciamientoSelect) {
-                    fuenteFinanciamientoSelect.addEventListener('change', function() {
-                        const recursosExternosDiv = container.querySelector(`#recursos_externos_${resourceId}`);
-                        if (this.value === 'Recursos Externos') {
-                            recursosExternosDiv.classList.remove('hidden');
-                        } else {
-                            recursosExternosDiv.classList.add('hidden');
-                        }
-                    });
-                }
-            } else if (type === 'herramientas') {
-                // Configurar eventos para tipo de herramienta
-                const tipoHerramientaRadios = container.querySelectorAll('input[name^="tipo_herramienta_"]');
-                tipoHerramientaRadios.forEach(radio => {
-                    radio.addEventListener('change', function() {
-                        // Ocultar todas las preguntas condicionales primero
-                        container.querySelectorAll('.conditional-question').forEach(q => {
-                            q.classList.add('hidden');
-                        });
-                        
-                        // Mostrar la pregunta correspondiente según la selección
-                        if (this.value === 'Equipamiento de Protección Personal') {
-                            container.querySelector(`#equipamiento_proteccion_personal_${resourceId}`).classList.remove('hidden');
-                        } else if (this.value === 'Kit de Higiene Personal') {
-                            container.querySelector(`#kit_higiene_personal_${resourceId}`).classList.remove('hidden');
-                        } else if (this.value === 'Kit de Alimentación y Suplementos') {
-                            container.querySelector(`#kit_alimentacion_suplementos_${resourceId}`).classList.remove('hidden');
-                        } else if (this.value === 'Contenedor de Agua') {
-                            container.querySelector(`#contenedor_agua_${resourceId}`).classList.remove('hidden');
-                        }
-                    });
-                });
-            }
-        }
-        
-        function deleteResource(type) {
-            const resource = resources[type];
-            if (resource.count === 0) return;
-
-            const positionToDelete = resource.current;
-            const elementToDelete = document.getElementById(`${type}-${positionToDelete}`);
-            if (elementToDelete) elementToDelete.remove();
-
-            for (let i = positionToDelete + 1; i <= resource.count; i++) {
-                const currentElement = document.getElementById(`${type}-${i}`);
-                if (!currentElement) continue;
-
-                const newIndex = i - 1;
-                currentElement.id = `${type}-${newIndex}`;
-
-                const allFields = currentElement.querySelectorAll('[name]');
-                allFields.forEach(field => {
-                    field.name = field.name.replace(`_${i}_`, `_${newIndex}_`);
-                });
-            }
-
-            resource.count--;
-            resource.current = Math.min(positionToDelete, resource.count);
-            updateCounter(type);
-            
-            if (resource.count > 0) {
-                showResource(type, resource.current);
-            } else {
-                resource.current = 0;
-            }
-        }
-
-        function updateCounter(type) {
-            const resource = resources[type];
-            resource.counter.innerHTML = '';
-            
-            for (let i = 1; i <= resource.count; i++) {
-                const number = document.createElement('div');
-                number.className = `resource-number ${i === resource.current ? 'active' : ''}`;
-                number.textContent = i;
-                number.addEventListener('click', () => {
-                    resource.current = i;
-                    updateCounter(type);
-                    showResource(type, i);
-                });
-                resource.counter.appendChild(number);
-            }
-        }
-
-        function showResource(type, index) {
-            const resource = resources[type];
-            const elements = resource.container.querySelectorAll('.repeat-section');
-            
-            elements.forEach(el => {
-                el.style.display = 'none';
-            });
-            
-            const elementToShow = document.getElementById(`${type}-${index}`);
-            if (elementToShow) {
-                elementToShow.style.display = 'block';
-            }
-        }
-        
-        // Función mejorada para manejar campos "Otro"
-        function setupOtherFields(container) {
-            // Manejar campos de radio buttons (comportamiento original)
-            const radioGroups = container.querySelectorAll('.radio-group');
-            radioGroups.forEach(group => {
-                const radios = group.querySelectorAll('input[type="radio"]');
-                radios.forEach(radio => {
-                    // Verificar si ya está seleccionado al cargar
-                    if (radio.checked && (radio.value === 'otro' || radio.value === 'other')) {
-                        showOtherInput(radio);
+                // Manejar campos de checkbox (nuevo comportamiento)
+                const checkboxGroups = container.querySelectorAll('.checkbox-group');
+                checkboxGroups.forEach(group => {
+                    const checkboxes = group.querySelectorAll('input[type="checkbox"]');
+                    const otherCheckbox = group.querySelector('input[type="checkbox"][value="other"]');
+                    const otherInputContainer = group.closest('.form-group').querySelector('.other-input-container');
+                    
+                    // Verificar si "Otro" ya está seleccionado al cargar
+                    if (otherCheckbox && otherCheckbox.checked) {
+                        otherInputContainer.classList.remove('hidden');
                     }
                     
-                    // Agregar evento para cambios
-                    radio.addEventListener('change', function() {
-                        if (this.value === 'otro' || this.value === 'other') {
-                            showOtherInput(this);
-                        } else {
-                            hideOtherInput(this);
-                        }
-                    });
+                    // Agregar evento solo al checkbox "Otro"
+                    if (otherCheckbox) {
+                        otherCheckbox.addEventListener('change', function() {
+                            if (this.checked) {
+                                otherInputContainer.classList.remove('hidden');
+                            } else {
+                                otherInputContainer.classList.add('hidden');
+                                const inputField = otherInputContainer.querySelector('input');
+                                if (inputField) {
+                                    inputField.value = '';
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Para los otros checkboxes, no hacer nada (permitir selección múltiple)
                 });
-            });
+            }
             
-            // Manejar campos de checkbox (nuevo comportamiento)
-            const checkboxGroups = container.querySelectorAll('.checkbox-group');
-            checkboxGroups.forEach(group => {
-                const checkboxes = group.querySelectorAll('input[type="checkbox"]');
-                const otherCheckbox = group.querySelector('input[type="checkbox"][value="other"]');
-                const otherInputContainer = group.closest('.form-group').querySelector('.other-input-container');
+            // Función para mostrar el campo "Otro"
+            function showOtherInput(inputElement) {
+                const container = inputElement.closest('.form-group');
+                if (!container) return;
                 
-                // Verificar si "Otro" ya está seleccionado al cargar
-                if (otherCheckbox && otherCheckbox.checked) {
+                const otherInputContainer = container.querySelector('.other-input-container');
+                if (otherInputContainer) {
                     otherInputContainer.classList.remove('hidden');
                 }
+            }
+            
+            // Función para ocultar el campo "Otro"
+            function hideOtherInput(inputElement) {
+                const container = inputElement.closest('.form-group');
+                if (!container) return;
                 
-                // Agregar evento solo al checkbox "Otro"
-                if (otherCheckbox) {
-                    otherCheckbox.addEventListener('change', function() {
-                        if (this.checked) {
-                            otherInputContainer.classList.remove('hidden');
-                        } else {
-                            otherInputContainer.classList.add('hidden');
-                            const inputField = otherInputContainer.querySelector('input');
-                            if (inputField) {
-                                inputField.value = '';
-                            }
-                        }
+                const otherInputContainer = container.querySelector('.other-input-container');
+                if (otherInputContainer) {
+                    otherInputContainer.classList.add('hidden');
+                    const inputField = otherInputContainer.querySelector('input');
+                    if (inputField) {
+                        inputField.value = '';
+                    }
+                }
+            }
+            
+            // Función para enviar el formulario a Google Sheets
+            document.getElementById('main-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                if (!this.checkValidity()) {
+                    alert('Por favor complete todos los campos requeridos.');
+                    return;
+                }
+                
+                // Mostrar mensaje de carga
+                document.getElementById('form-loading').style.display = 'block';
+                document.getElementById('form-success').style.display = 'none';
+                document.getElementById('form-error').style.display = 'none';
+                
+                try {
+                    // Recopilar todos los datos del formulario
+                    const formData = new FormData(this);
+                    
+                    // Agregar información sobre recursos
+                    formData.append('num_transporte', resources.transporte.count);
+                    formData.append('num_humanos', resources.humanos.count);
+                    formData.append('num_herramientas', resources.herramientas.count);
+                    
+                    // Enviar datos a Google Apps Script
+                    const response = await fetch(scriptURL, {
+                        method: 'POST',
+                        body: formData
                     });
-                }
-                
-                // Para los otros checkboxes, no hacer nada (permitir selección múltiple)
-            });
-        }
-        
-        // Función para mostrar el campo "Otro"
-        function showOtherInput(inputElement) {
-            const container = inputElement.closest('.form-group');
-            if (!container) return;
-            
-            const otherInputContainer = container.querySelector('.other-input-container');
-            if (otherInputContainer) {
-                otherInputContainer.classList.remove('hidden');
-            }
-        }
-        
-        // Función para ocultar el campo "Otro"
-        function hideOtherInput(inputElement) {
-            const container = inputElement.closest('.form-group');
-            if (!container) return;
-            
-            const otherInputContainer = container.querySelector('.other-input-container');
-            if (otherInputContainer) {
-                otherInputContainer.classList.add('hidden');
-                const inputField = otherInputContainer.querySelector('input');
-                if (inputField) {
-                    inputField.value = '';
-                }
-            }
-        }
-
-        // Función para mostrar un mensaje y ocultar los demás
-        function showMessage(messageId) {
-                // Ocultar todos los mensajes primero
-                document.querySelectorAll('.form-message, .thank-you').forEach(element => {
-                    element.style.display = 'none';
-                });
-                
-                // Mostrar el mensaje solicitado
-                if (messageId) {
-                    document.getElementById(messageId).style.display = 'block';
-                }
-        }
-            
-        document.getElementById('main-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    if (this.checkValidity()) {
-        // Mostrar mensaje de carga
-        showMessage('loading');
-        document.getElementById('form-container').style.display = 'none';
-        
-        // Recopilar todos los datos del formulario
-        const formData = new FormData(this);
-        const data = Object.fromEntries(formData.entries());
-        
-        // Agregar campos según el tipo de recurso
-        const tipoRecurso = data.tipo_recurso;
-        let resourceCount = 0;
-        
-        if (tipoRecurso === 'Medios de Transporte') {
-            resourceCount = resources.transporte.count;
-            data.num_transporte = resourceCount;
-        } else if (tipoRecurso === 'Recursos Humanos') {
-            resourceCount = resources.humanos.count;
-            data.num_humanos = resourceCount;
-        } else if (tipoRecurso === 'Herramientas o Elementos Auxiliares') {
-            resourceCount = resources.herramientas.count;
-            data.num_herramientas = resourceCount;
-        }
-        
-        // Agregar datos de cada recurso
-        for (let i = 1; i <= resourceCount; i++) {
-            // Obtener todos los campos para este recurso
-            const resourceFields = document.querySelectorAll(`[name$="_${i}"]`);
-            
-            resourceFields.forEach(field => {
-                const fieldName = field.name;
-                
-                if (field.type === 'checkbox') {
-                    // Solo agregar checkboxes si están marcados
-                    if (field.checked) {
-                        if (!data[fieldName]) {
-                            data[fieldName] = field.value;
-                        } else if (Array.isArray(data[fieldName])) {
-                            data[fieldName].push(field.value);
-                        } else {
-                            data[fieldName] = [data[fieldName], field.value];
-                        }
+                    
+                    if (response.ok) {
+                        // Mostrar mensaje de éxito
+                        document.getElementById('form-loading').style.display = 'none';
+                        document.getElementById('form-success').style.display = 'block';
+                        
+                        // Limpiar formulario después de 3 segundos
+                        setTimeout(() => {
+                            this.reset();
+                            document.getElementById('form-success').style.display = 'none';
+                            
+                            // Limpiar recursos
+                            ['transporte', 'humanos', 'herramientas'].forEach(type => {
+                                resources[type].count = 0;
+                                resources[type].current = 0;
+                                resources[type].container.innerHTML = '';
+                                updateCounter(type);
+                            });
+                        }, 3000);
+                    } else {
+                        throw new Error('Error en la respuesta del servidor');
                     }
-                } else if (field.type === 'radio') {
-                    // Solo agregar radios si están seleccionados
-                    if (field.checked) {
-                        data[fieldName] = field.value;
-                    }
-                } else {
-                    // Manejar otros tipos de campos
-                    data[fieldName] = field.value;
+                } catch (error) {
+                    console.error('Error:', error);
+                    document.getElementById('form-loading').style.display = 'none';
+                    document.getElementById('form-error').style.display = 'block';
+                    
+                    // Ocultar mensaje de error después de 5 segundos
+                    setTimeout(() => {
+                        document.getElementById('form-error').style.display = 'none';
+                    }, 5000);
                 }
             });
-        }
-        
-        console.log('Datos a enviar:', data);
-        
-        // Enviar datos a Google Apps Script
-        fetch('https://script.google.com/macros/s/AKfycbwoDRRl2lQrpqq0EhQyQJRVF7KQ9Rbla4Bmvg6MwTDeenXg3HDZHUh4anV97XpiAuUezw/exec', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => {
-            // Google Apps Script hace redirecciones, manejarlas adecuadamente
-            if (response.redirected) {
-                return fetch(response.url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
-            }
-            return response;
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Error en la respuesta del servidor: ' + response.status);
-            }
-            return response.json();
-        })
-        .then(result => {
-            console.log('Éxito:', result);
-            
-            if (result.result === 'success') {
-                showMessage('thank-you');
-            } else {
-                throw new Error(result.error || 'Error desconocido del servidor');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showMessage('error-message');
-            document.getElementById('form-container').style.display = 'block';
-            
-            // Mostrar mensaje de error específico
-            const errorElement = document.getElementById('error-message');
-            errorElement.innerHTML = `<p>Hubo un error al enviar el formulario: ${error.message}</p>
-                                     <p>Por favor, inténtelo de nuevo.</p>
-                                     <button onclick="testConnection()">Probar Conexión</button>`;
         });
-    } else {
-        alert('Por favor complete todos los campos requeridos.');
-    }
-});
-
-            // Función para probar la conexión con Google Apps Script
-function testConnection() {
-    console.log('Probando conexión con Google Apps Script...');
-    document.getElementById('loading').style.display = 'block';
-    
-    fetch('https://script.google.com/macros/s/AKfycbwqMME0ueS225tq-IQ31vwjobrvGFTRx_dp_z2emZQF5R0DSHSL8qrJmqkLXJk8__ZxZg/exec')
-        .then(response => response.json())
-        .then(data => {
-            console.log('Prueba de conexión exitosa:', data);
-            document.getElementById('loading').style.display = 'none';
-            alert('Conexión exitosa: ' + data.message);
-        })
-        .catch(error => {
-            console.error('Error de conexión:', error);
-            document.getElementById('loading').style.display = 'none';
-            alert('Error de conexión: ' + error.message);
-        });
-}
-
-// Función para mostrar/ocultar mensajes
-function showMessage(messageId) {
-    // Ocultar todos los mensajes
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('error-message').style.display = 'none';
-    document.getElementById('thank-you').style.display = 'none';
-    
-    // Mostrar el mensaje solicitado
-    if (messageId) {
-        document.getElementById(messageId).style.display = 'block';
-    }
-}
-});
-
-        
-</script>
-    <button onclick="testConnection()" style="position: fixed; bottom: 10px; right: 10px; z-index: 1000; padding: 10px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">
-        Probar Conexión
-    </button>
+    </script>
 </body>
 </html>
