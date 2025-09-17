@@ -2614,55 +2614,67 @@
                     }
                 }
             }
-            
-            document.getElementById('main-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                if (this.checkValidity()) {
-                    // Recopilar todos los datos del formulario
-                    const formData = new FormData(this);
-                    const data = Object.fromEntries(formData.entries());
-                    
-                    // Agregar datos de recursos dinámicos
-                    data.transporte_count = resources.transporte.count;
-                    data.humanos_count = resources.humanos.count;
-                    data.herramientas_count = resources.herramientas.count;
-                    
-                    // Agregar datos de coordenadas de mapas si existen
-                    for (const [type, resource] of Object.entries(resources)) {
-                        for (let i = 1; i <= resource.count; i++) {
-                            const mapContainer = document.getElementById(`map-container-${type}-${i}`);
-                            if (mapContainer && resource.maps && resource.maps[i]) {
-                                const mapData = resource.maps[i];
-                                data[`${type}_${i}_lat`] = mapData.latInput.value;
-                                data[`${type}_${i}_lng`] = mapData.lngInput.value;
-                            }
-                        }
-                    }
-                    
-                    // Reemplaza con tu URL de Web App de Google Apps Script
-                    const webAppUrl = 'https://script.google.com/macros/s/AKfycby-oxeL9J26uES_z_Cb6_IsQyF26C5YYxqP40c2j0aAqenN8OnkBG8hDcGGVSKqhxtW1Q/exec';
-                    
-                    fetch(webAppUrl, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(data)
-                    })
-                    .then(() => {
-                        document.getElementById('form-container').style.display = 'none';
-                        document.getElementById('thank-you').style.display = 'block';
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Hubo un error al enviar el formulario. Por favor, inténtelo nuevamente.');
-                    });
-                } else {
-                    alert('Por favor complete todos los campos requeridos.');
+
+        function collectCoordinates() {
+    const coordinates = {};
+    
+    for (const [type, resource] of Object.entries(resources)) {
+        if (resource.maps) {
+            for (let i = 1; i <= resource.count; i++) {
+                if (resource.maps[i]) {
+                    coordinates[`coordenadas_${type}_${i}_lat`] = resource.maps[i].latInput.value;
+                    coordinates[`coordenadas_${type}_${i}_lng`] = resource.maps[i].lngInput.value;
                 }
-            });
+            }
+        }
+    }
+    
+    return coordinates;
+}
+
+// Modificar la función de envío del formulario
+document.getElementById('main-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    if (this.checkValidity()) {
+        // Recopilar todos los datos del formulario
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+        
+        // Agregar datos de recursos dinámicos
+        data.transporte_count = resources.transporte.count;
+        data.humanos_count = resources.humanos.count;
+        data.herramientas_count = resources.herramientas.count;
+        
+        // Agregar coordenadas de los mapas
+        const coordenadas = collectCoordinates();
+        Object.assign(data, coordenadas);
+        
+        // Reemplaza con tu URL de Web App de Google Apps Script
+        const webAppUrl = 'https://script.google.com/macros/s/AKfycbxs-N9vYOzfi3KZjS2cL0rWjPqoNVHw8cCG-0FSKENhAIA_5NxMhzS6jCwXuRt2G-t2Ug/exec';
+        
+        console.log('Datos a enviar:', data); // Para depuración
+        
+        fetch(webAppUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(() => {
+            document.getElementById('form-container').style.display = 'none';
+            document.getElementById('thank-you').style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Hubo un error al enviar el formulario. Por favor, inténtelo nuevamente.');
+        });
+    } else {
+        alert('Por favor complete todos los campos requeridos.');
+    }
+});
             
             // Modificar la función initMap para guardar referencia a los mapas
             function initMap(containerId, resourceType, resourceId) {
@@ -2686,5 +2698,6 @@
     </script>
 </body>
 </html>
+
 
 
