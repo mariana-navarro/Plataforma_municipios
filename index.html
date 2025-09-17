@@ -670,6 +670,91 @@
             border-radius: 6px;
             border-left: 4px solid #3498db;
         }
+
+        /* Estilos para el contenedor del mapa */
+        .map-container {
+            height: 400px;
+            width: 100%;
+            margin-top: 10px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #ddd;
+            min-height: 400px; /* Asegura una altura mínima */
+        }
+        
+        /* Asegurar que Leaflet tenga los estilos correctos */
+        .leaflet-container {
+            height: 100%;
+            width: 100%;
+            z-index: 1;
+        }
+        
+        /* Contenedor de coordenadas */
+        .coordinates-container {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px;
+            border-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 14px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .coordinates-container .coord-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .coordinates-container label {
+            color: #2c3e50;
+            font-weight: bold;
+            margin: 0;
+            white-space: nowrap;
+            min-width: 40px;
+        }
+        
+        .coordinates-container input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            background: white;
+            min-width: 100px;
+        }
+        
+        .coordinates-container input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        /* Asegurar que los controles del mapa sean visibles */
+        .leaflet-control-geocoder {
+            box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+            border-radius: 4px;
+        }
+        
+        .leaflet-control-geocoder-form {
+            margin: 0;
+        }
+        
+        .leaflet-control-geocoder-form input {
+            padding: 8px 12px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -2165,6 +2250,164 @@
                         initMap(`map-container-herramienta-${resource.count}`);
                     }
                 }, 0);
+
+                // Inicializar el mapa
+                const mapInstance = initMap(mapContainerId, type, resource.count);
+                
+                // Guardar referencia al mapa
+                if (mapInstance) {
+                    if (!resources[type].maps) {
+                        resources[type].maps = {};
+                    }
+                    resources[type].maps[resource.count] = mapInstance;
+                }
+            }, 100);
+        }
+        
+        // Función para inicializar un mapa (versión corregida)
+        function initMap(containerId, resourceType, resourceId) {
+            const mapDiv = document.getElementById(containerId);
+            if (!mapDiv) {
+                console.error('No se encontró el contenedor del mapa:', containerId);
+                return null;
+            }
+            
+            // Limpiar el contenedor y establecer un tamaño mínimo
+            mapDiv.innerHTML = '';
+            mapDiv.style.minHeight = '400px';
+            
+            // Coordenadas iniciales (Santiago de Chile)
+            const initialLat = -33.4489;
+            const initialLng = -70.6693;
+            
+            // Crear el mapa
+            const map = L.map(containerId).setView([initialLat, initialLng], 13);
+            
+            // Añadir capa de OpenStreetMap
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 19
+            }).addTo(map);
+            
+            // Añadir marcador
+            let marker = L.marker([initialLat, initialLng], {
+                draggable: true
+            }).addTo(map);
+            
+            // Crear contenedor de coordenadas
+            const coordsContainer = L.DomUtil.create('div', 'coordinates-container');
+            map.getContainer().appendChild(coordsContainer);
+            
+            // Grupo Latitud
+            const latGroup = L.DomUtil.create('div', 'coord-group');
+            const latLabel = L.DomUtil.create('label', '', latGroup);
+            latLabel.textContent = 'Lat:';
+            const latInput = L.DomUtil.create('input', 'coord-input', latGroup);
+            latInput.type = 'text';
+            latInput.value = initialLat.toFixed(6);
+            latInput.setAttribute('data-coord', 'lat');
+            latInput.setAttribute('name', `coordenadas_${resourceType}_${resourceId}_lat`);
+            
+            // Grupo Longitud
+            const lngGroup = L.DomUtil.create('div', 'coord-group');
+            const lngLabel = L.DomUtil.create('label', '', lngGroup);
+            lngLabel.textContent = 'Lon:';
+            const lngInput = L.DomUtil.create('input', 'coord-input', lngGroup);
+            lngInput.type = 'text';
+            lngInput.value = initialLng.toFixed(6);
+            lngInput.setAttribute('data-coord', 'lng');
+            lngInput.setAttribute('name', `coordenadas_${resourceType}_${resourceId}_lng`);
+            
+            // Agregar grupos al contenedor
+            coordsContainer.appendChild(latGroup);
+            coordsContainer.appendChild(lngGroup);
+            
+            // Añadir control de búsqueda
+            L.Control.geocoder({
+                defaultMarkGeocode: false,
+                position: 'topleft',
+                placeholder: 'Buscar dirección...',
+                errorMessage: 'No se encontraron resultados.',
+                geocoder: L.Control.Geocoder.nominatim({
+                    geocodingQueryParams: {
+                        countrycodes: 'cl', // Limitar a Chile
+                        'accept-language': 'es'
+                    }
+                })
+            })
+            .on('markgeocode', function(e) {
+                const { center, name } = e.geocode;
+                
+                // Mover el marcador a la ubicación encontrada
+                marker.setLatLng(center);
+                map.setView(center, 16);
+                
+                // Actualizar coordenadas
+                latInput.value = center.lat.toFixed(6);
+                lngInput.value = center.lng.toFixed(6);
+                
+                // Actualizar campo de ubicación geográfica
+                const ubicacionInput = document.querySelector(`input[name^="ubicacion_${resourceType}_${resourceId}"]`);
+                if (ubicacionInput) {
+                    ubicacionInput.value = name;
+                }
+            })
+            .addTo(map);
+        
+            // Función para actualizar coordenadas
+            function updateCoordinates(lat, lng) {
+                latInput.value = lat.toFixed(6);
+                lngInput.value = lng.toFixed(6);
+            }
+            
+            // Actualizar coordenadas cuando se mueve el marcador
+            marker.on('dragend', function(e) {
+                const { lat, lng } = e.target.getLatLng();
+                updateCoordinates(lat, lng);
+            });
+            
+            // Manejar clics en el mapa
+            map.on('click', function(e) {
+                const { lat, lng } = e.latlng;
+                marker.setLatLng([lat, lng]);
+                updateCoordinates(lat, lng);
+            });
+            
+            // Forzar el redimensionamiento del mapa después de un breve retraso
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 300);
+            
+            return {
+                map: map,
+                marker: marker,
+                latInput: latInput,
+                lngInput: lngInput
+            };
+        }
+        
+        // Asegúrate de que esta función existe para mostrar el recurso correcto
+        function showResource(type, index) {
+            const resource = resources[type];
+            const elements = resource.container.querySelectorAll('.repeat-section');
+            
+            elements.forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            const elementToShow = document.getElementById(`${type}-${index}`);
+            if (elementToShow) {
+                elementToShow.style.display = 'block';
+                
+                // Redimensionar el mapa cuando se muestra la sección
+                setTimeout(() => {
+                    if (resource.maps && resource.maps[index] && resource.maps[index].map) {
+                        resource.maps[index].map.invalidateSize();
+                    }
+                }, 100);
+            }
+        }
+
             }
             
             // Función para configurar las preguntas condicionales
@@ -2443,4 +2686,5 @@
     </script>
 </body>
 </html>
+
 
