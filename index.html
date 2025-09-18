@@ -10,8 +10,666 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 
     <style>
-        /* Todos tus estilos CSS se mantienen igual */
-        /* ... (todo el CSS original) ... */
+        /* Tus estilos existentes se mantienen igual */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #f5f5f5;
+            background-image: url('https://live.staticflickr.com/127/333447132_87ae335326_b.jpg'); /* Cambia por tu URL */
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .banner {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .banner img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+            max-height: 200px; /* Ajusta esta altura máxima según necesites */
+        }
+
+        /* Elimina el h1 del banner si solo quieres la imagen */
+        .banner h1 {
+            display: none; /* Oculta el título si solo quieres la imagen */
+        }
+
+        /* Añade margen superior al contenedor principal */
+        /* Banner superior del formulario */
+        .form-header-banner {
+            background-color: #003366; /* Color azul */
+            color: white;
+            padding: 15px 30px;
+            font-size: 23px;
+            font-weight: bold;
+            margin: -30px -30px 30px -30px; /* Negativos para "salir" del padding del contenedor */
+            border-radius: 8px 8px 0 0; /* Solo esquinas superiores redondeadas */
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Ajuste para el contenedor principal */
+        .container {
+            max-width: 1000px;
+            margin: 30px auto 0;
+            background: #dce9f5ab;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            overflow: hidden; /* Importante para que el banner no sobresalga */
+        }
+
+        .main-content {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 1000px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #dce9f5d2;
+            overflow: hidden;
+        }
+        .section-header {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .section-title {
+            margin: 0 0 10px 0;
+            color: #003366;
+            width: 100%;
+        }
+        .resource-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        .resource-counter {
+            display: flex;
+            gap: 5px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            max-width: calc(100% - 80px);
+        }
+
+        /* Botón de eliminar (basurero) */
+        .delete-button {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: white;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0;
+        }
+
+        .delete-button svg {
+            width: 14px;
+            height: 16px;
+            fill: #666;
+            transition: all 0.3s ease;
+        }
+
+        .delete-button:hover {
+            background-color: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        .delete-button:hover svg {
+            fill: white;
+        }
+
+        /* Números de recurso */
+        .resource-number {
+            min-width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: white;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .resource-number:hover, 
+        .resource-number.active {
+            background-color: #003366;
+            border-color: #003366;
+            color: white;
+        }
+
+        /* Botón de agregar (+) */
+        .add-button {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: transparent;
+            border: 1px dashed #666;
+            color: #666;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0;
+            position: relative;
+        }
+
+        .add-button::before {
+            content: "+";
+            position: absolute;
+        }
+
+        .add-button:hover {
+            border-color: #003366;
+            color: #003366;
+        }
+
+        /* Contenedores (mantener estos que ya tienes) */
+        .resource-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .resource-counter {
+            display: flex;
+            gap: 5px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            max-width: calc(100% - 80px);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            width: 100%;
+            overflow: hidden;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .hint {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Estilos unificados para todos los campos de entrada */
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: white;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            margin-top: 5px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .form-control:hover {
+            border-color: #3498db;
+        }
+
+        /* Estilo específico para selects */
+        select.form-control {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 12px;
+            padding-right: 35px;
+        }
+
+        /* Estilo para textarea */
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Contenedor para campos de fecha/hora */
+        .datetime-container {
+            position: relative;
+        }
+
+        .datetime-container::after {
+            content: '';
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            pointer-events: none;
+        }
+
+        input[type="date"].form-control,
+        input[type="time"].form-control,
+        input[type="datetime-local"].form-control {
+            padding-right: 35px;
+        }
+
+        input[type="date"].form-control + .datetime-container::after {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z'/%3E%3C/svg%3E");
+        }
+
+        input[type="time"].form-control + .datetime-container::after {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z'/%3E%3Cpath d='M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z'/%3E%3C/svg%3E");
+        }
+
+        input[type="datetime-local"].form-control + .datetime-container::after {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z'/%3E%3C/svg%3E");
+        }
+        
+        /* Estilos consistentes para radio buttons */
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 100%;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .radio-option:hover {
+            border-color: #3498db;
+        }
+
+        .radio-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .radio-option .custom-radio {
+            position: relative;
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            margin-right: 12px;
+            border: 2px solid #3498db;
+            border-radius: 50%;
+            background-color: white;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .radio-option input[type="radio"]:checked + .custom-radio {
+            border-color: #3498db;
+        }
+
+        .radio-option input[type="radio"]:checked + .custom-radio::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background-color: #3498db;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            display: block;
+        }
+
+        .radio-option .option-text {
+            font-weight: normal;
+            color: #333;
+            flex-grow: 1;
+        }
+
+        .radio-option input[type="radio"]:checked ~ .option-text {
+            color: #3498db;
+        }
+
+        /* Estilos para checkbox con 3 columnas */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 100%;
+        }
+
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-option:hover {
+            border-color: #3498db;
+        }
+
+        .checkbox-option input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .checkbox-option .custom-checkbox {
+            position: relative;
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            margin-right: 12px;
+            border: 2px solid #3498db;
+            border-radius: 4px;
+            background-color: white;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .checkbox-option input[type="checkbox"]:checked + .custom-checkbox {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+
+        .checkbox-option input[type="checkbox"]:checked + .custom-checkbox::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 12px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/%3E%3C/svg%3E");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: contain;
+            transform: translate(-50%, -50%);
+            display: block;
+        }
+
+        .checkbox-option .option-text {
+            font-weight: normal;
+            color: #333;
+            flex-grow: 1;
+        }
+
+        .checkbox-option input[type="checkbox"]:checked ~ .option-text {
+            color: #3498db;
+        }
+
+        .required:after {
+            content: " *";
+            color: red;
+        }
+        .submit-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: block;
+            margin: 30px auto 0;
+            width: auto;
+            max-width: 100%;
+        }
+        .repeat-section {
+            border: 1px dashed #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #eaf2f8;
+            overflow: hidden;
+        }
+        .hidden {
+            display: none;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .thank-you {
+            text-align: center;
+            padding: 30px;
+            display: none;
+        }
+        .thank-you img {
+            max-width: 100px;
+            margin-bottom: 20px;
+        }
+
+        /* Estilo para el contenedor de búsqueda */
+        .map-search-container {
+            position: absolute;
+            top: 10px;
+            left: 50px;
+            right: 50px;
+            z-index: 1000;
+        }
+        .map-search-input {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 1px solid #d3d3d3;
+            border-radius: 24px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            outline: none;
+        }
+        .map-search-input:focus {
+            border-color: #4d90fe;
+        }
+        
+        /* Estilo mejorado para las sugerencias */
+        .search-suggestions {
+            background: white;
+            border-radius: 0 0 24px 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            margin-top: -12px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+        .search-suggestion {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+        .search-suggestion:hover {
+            background-color: #f5f5f5;
+        }
+        .search-suggestion:last-child {
+            border-bottom: none;
+        }
+        .search-suggestion.active {
+            background-color: #e6f2ff;
+        }
+        .search-suggestion .main-text {
+            font-weight: bold;
+            display: block;
+        }
+        .search-suggestion .secondary-text {
+            color: #666;
+            font-size: 0.9em;
+            display: block;
+        }
+
+        /* Estilo para las sugerencias de búsqueda */
+        .geocoder-control-suggestions {
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: -1px;
+        }
+
+        .geocoder-control-suggestions.hidden {
+            display: none;
+        }
+
+        .geocoder-control-suggestion {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .geocoder-control-suggestion:last-child {
+            border-bottom: none;
+        }
+
+        .geocoder-control-suggestion:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Estilo del contenedor de coordenadas */
+        .coordinates-container {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .coordinates-container .coord-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .coordinates-container label {
+            color: #555;
+            font-weight: bold;
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .coordinates-container input {
+            width: 120px;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 13px;
+            background: white;
+        }
+
+        /* Créditos del mapa */
+        .map-credit {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            color: #555;
+        }
+
+        /* Estilo para el contenedor del mapa */
+        .map-container {
+            height: 400px;  /* Aumentamos la altura */
+            width: 100%;    /* Mantenemos el ancho al 100% */
+            margin-top: 10px;
+            background-color: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 1 / 1; /* Esto fuerza una relación 1:1 (cuadrado perfecto) */
+        }
+        
+        /* Nuevos estilos para campos de "Otro" */
+        .other-input-container {
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        /* Estilos para preguntas condicionales */
+        .conditional-question {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #3498db;
+        }
     </style>
 </head>
 <body>
@@ -1776,4 +2434,5 @@
     </script>
 </body>
 </html>
+
 
