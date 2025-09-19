@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formularios Comunal y Mapa de Albergues</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&family=Lora:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Contenedor del banner */
+        .banner {
+            width: 100%;
+            height: auto;
+            position: relative;
+            overflow: hidden;
+        }
+        .banner img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #14588C !important;
+            border: none;
+            margin-bottom: 0;
+        }
+        .navbar .container {
+            width: 100%;
+            padding-left: 0;
+        }
+        .navbar-nav > li > a {
+            color: white !important;
+            padding: 15px;
+            display: block;
+            position: relative;
+        }
+        .navbar-nav > li > a::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 4px;
+            background-color: white;
+            opacity: 0;
+            transition: opacity 0.1s ease-in-out;
+        }
+        .navbar-nav > li > a:hover::after {
+            opacity: 1;
+        }
+
+        /* Estilo de la barra del breadcrumb */
+        .breadcrumb-navbar {
+            background-color: #114A76;
+            padding: 0;
+        }
+        .breadcrumb-navbar .container {
+            padding-left: 0 !important;
+            margin-left: 0 !important;
+            width: 100%;
+        }
+        .breadcrumb {
+            list-style: none;
+            margin: 0;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: flex-start; 
+            color: white;
+            background: none;
+        }
+        .breadcrumb li {
+            margin-right: 10px;
+        }
+        .breadcrumb li a {
+            color: white;
+            text-decoration: none;
+        }
+        .breadcrumb li a:hover {
+            text-decoration: underline;
+        }
+
+        .hero-section {
+            background: url('https://raw.githubusercontent.com/mariana-navarro/imagenes/refs/heads/main/hub%20los%20rios/DSC00072%20(1).JPG') no-repeat center center;
+            background-size: cover;
+            text-align: center;
+            color: white;
+            padding: 150px 20px;
+        }
+
+        .hero-section h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 5.2em;
+            font-weight: 700;
+            margin-bottom: 100px;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 80px;
+            flex-wrap: wrap;
+        }
+
+        .button-group .btn {
+            padding: 12px 20px;
+            font-size: 2.2em;
+            background-color: #114A76;
+            border: none;
+            color: white;
+            transition: background-color 0.3s, transform 0.3s;
+            max-width: 30%;
+            white-space: normal;
+            word-wrap: break-word;
+            border-radius: 30px;
+        }
+
+        .button-group .btn:hover {
+            background-color: #114A76;
+            transform: scale(1.1);
+        }
+
+        .blue-band {
+            background-color: #114A76;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 2em;
+        }
+
+        .button-grid-container {
+            background-color: #ededed;
+            padding: 100px 20px;
+            text-align: center;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 columnas */
+            gap: 60px;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .button-grid div {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin-bottom: 0;
+            min-height: 65px; /* Asegura que todos los botones tengan la misma altura */
+            min-width: 150px;  /* Asegura que todos los botones tengan el mismo ancho */
+            height: 100%;      /* Para que los botones usen toda la altura disponible */
+        }
+
+        .button-grid img {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            display: block;
+            margin-bottom: 0;
+        }
+
+        .button-grid a {
+            text-decoration: none;
+            font-size: 1em;
+            font-weight: bold;
+            color: #114A76;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .button-grid .text {
+            font-size: 1.05em;
+            font-weight: bold;
+            pointer-events: none;
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .button-grid div:nth-child(odd) {
+            text-align: center;
+        }
+
+        .button-grid div:hover {
+            border: 1px solid #918e8e;
+        }
+
+        /* Sección principal */
+        .main-content {
+            padding: 30px 20px;
+        }
+
+        .section-title {
+            font-family: 'Lora', serif;
+            color: #114A76;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .subsection-title {
+            font-family: 'Lora', serif;
+            color: #114A76;
+            font-size: 1.8em;
+            margin: 25px 0 15px;
+            border-bottom: 2px solid #114A76;
+            padding-bottom: 8px;
+        }
+
+        /* Tarjetas de formularios */
+        .form-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .form-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .form-card h3 {
+            color: #114A76;
+            margin-top: 0;
+        }
+
+        .btn-form {
+            background-color: #114A76;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-form:hover {
+            background-color: #0d3a5c;
+        }
+
+        /* Mapa de albergues */
+        .map-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .map-title {
+            text-align: center;
+            color: #114A76;
+            font-family: 'Lora', serif;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .map-placeholder {
+            background-color: #e9ecef;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .map-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .map-info h4 {
+            color: #114A76;
+            margin-top: 0;
+        }
+
+        .requirements-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .requirements-list li {
+            padding: 5px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #114A76;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 2em;
+            }
+            
+            .subsection-title {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Banner -->
+    <header class="banner">
+        <img src="https://raw.githubusercontent.com/mariana-navarro/imagenes/refs/heads/main/hub%20los%20rios/SIGER%20(2).png" alt="Logo">
+    </header>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-inverse navbar-static-top">
+        <div class="container">
+            <div class="collapse navbar-collapse" id="main-navbar">
+                <ul class="nav navbar-nav">
+                    <li><a href="#formularios">Formularios</a></li>
+                    <li><a href="#albergues">Mapa de Albergues</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div id=info class="hero-section">
+        <h1>Formularios</h1>
+        <div class="button-group">
+            <button class="btn">Levantamiento Capacidades Comunales</button>
+            <button class="btn">Solicitudes Etapa de Respuesta</button>
+            <button class="btn">Solicitudes Etapa de Recuperación</button>
+        </div>
+    </div>
+
+    <!-- Banda azul -->
+    <div id=visores class="blue-band">Mapas Interactivos</div>
+
+    <!-- Contenido principal -->
+    <div class="main-content">
+
+        <div id="albergues" class="map-container">
+            <h2 class="map-title">Capacidades Comunales</h2>
+            
+            <div class="map-placeholder">
+                <!-- Aquí iría el mapa real, esto es solo un placeholder -->
+                <p>Capacidades comunales (se integraría aquí)</p>
+            </div>
+        </div>
+
+        <div id="albergues" class="map-container">
+            <h2 class="map-title">Mapa de Albergues</h2>
+            
+            <div class="map-placeholder">
+                <!-- Aquí iría el mapa real, esto es solo un placeholder -->
+                <p>Mapa interactivo de albergues (se integraría aquí)</p>
+            </div>
+        </div>
+            
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</body>
+</html>
