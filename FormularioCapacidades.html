@@ -799,6 +799,11 @@
                     <div id="herramientas-repeats"></div>
                 </div>
                 
+                <!-- Campos ocultos para los contadores -->
+                <input type="hidden" id="transporte_count" name="transporte_count" value="0">
+                <input type="hidden" id="humanos_count" name="humanos_count" value="0">
+                <input type="hidden" id="herramientas_count" name="herramientas_count" value="0">
+                
                 <button type="submit" class="submit-btn">Enviar</button>
             </form>
         </div>
@@ -816,6 +821,9 @@
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <script>
+        // URL del Web App de Google Apps Script
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxs-N9vYOzfi3KZjS2cL0rWjPqoNVHw8cCG-0FSKENhAIA_5NxMhzS6jCwXuRt2G-t2Ug/exec';
+
         document.addEventListener('DOMContentLoaded', function() {
             // Configurar fecha y hora actual
             const now = new Date();
@@ -952,6 +960,7 @@
                 latInput.type = 'text';
                 latInput.value = initialLat.toFixed(6);
                 latInput.setAttribute('data-coord', 'lat');
+                latInput.name = `coordenadas_${resourceType}_${resourceId}_lat`;
                 
                 // Grupo Longitud
                 const lngGroup = L.DomUtil.create('div', 'coord-group');
@@ -961,6 +970,7 @@
                 lngInput.type = 'text';
                 lngInput.value = initialLng.toFixed(6);
                 lngInput.setAttribute('data-coord', 'lng');
+                lngInput.name = `coordenadas_${resourceType}_${resourceId}_lng`;
                 
                 // Agregar grupos al contenedor
                 coordsContainer.appendChild(latGroup);
@@ -1098,6 +1108,9 @@
                 resource.count++;
                 resource.current = resource.count;
 
+                // Actualizar el campo hidden del contador
+                document.getElementById(`${type}_count`).value = resource.count;
+                
                 updateCounter(type);
                 
                 const repeatDiv = document.createElement('div');
@@ -1590,7 +1603,7 @@
                                     <input type="radio" name="tipo_humano_${resource.count}" value="otro">
                                     <span class="custom-radio"></span>
                                     <span class="option-text">Otro</span>
-                                </label>
+                                    </label>
                             </div>
                             <div class="other-input-container hidden">
                                 <input type="text" name="tipo_humano_otro_${resource.count}" class="form-control" placeholder="Especifique otro tipo">
@@ -1888,30 +1901,30 @@
                         <div id="kit_higiene_personal_${resource.count}" class="conditional-question hidden">
                             <div class="form-group">
                                 <label class="required">Kit de Higiene Personal:</label>
-                                <div class="checkbox-group"> <!-- CAMBIADO: radio-group → checkbox-group -->
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                <div class="checkbox-group">
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_higiene_personal_${resource.count}[]" value="Kit Higiene Hombre">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Kit Higiene Hombre</span>
                                     </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_higiene_personal_${resource.count}[]" value="Kit Higiene Mujer">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Kit Higiene Mujer</span>
                                     </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_higiene_personal_${resource.count}[]" value="Kit Higiene Infantil">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Kit Higiene Infantil</span>
                                     </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_higiene_personal_${resource.count}[]" value="Kit Higiene Lactante">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Kit Higiene Lactante</span>
                                     </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_higiene_personal_${resource.count}[]" value="other"> 
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Otro</span>
                                     </label>
                                 </div>
@@ -1924,25 +1937,25 @@
                         <div id="kit_alimentacion_suplementos_${resource.count}" class="conditional-question hidden">
                             <div class="form-group">
                                 <label class="required">Kit de Alimentación y Suplementos:</label>
-                                <div class="checkbox-group"> <!-- CAMBIADO: radio-group → checkbox-group -->
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                <div class="checkbox-group">
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_alimentacion_suplementos_${resource.count}[]" value="Kit de Alimentación 4 Pers.- 4 días">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Kit de Alimentación 4 Pers.- 4 días</span>
                                     </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_alimentacion_suplementos_${resource.count}[]" value="Kit Alimentos 4 Pers. - 7 días">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Kit Alimentos 4 Pers. - 7 días</span>
                                     </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_alimentacion_suplementos_${resource.count}[]" value="Kit Alimentos Mascotas">
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Kit Alimentos Mascotas</span>
                                     </label>
-                                    <label class="checkbox-option"> <!-- CAMBIADO: radio-option → checkbox-option -->
+                                    <label class="checkbox-option">
                                         <input type="checkbox" name="kit_alimentacion_suplementos_${resource.count}[]" value="other"> 
-                                        <span class="custom-checkbox"></span> <!-- CAMBIADO: custom-radio → custom-checkbox -->
+                                        <span class="custom-checkbox"></span>
                                         <span class="option-text">Otro</span>
                                     </label>
                                 </div>
@@ -2158,11 +2171,11 @@
                 // Inicializar el mapa después de que el elemento exista en el DOM
                 setTimeout(() => {
                     if (type === 'transporte') {
-                        initMap(`map-container-transporte-${resource.count}`);
+                        resources.transporte.maps[resource.count] = initMap(`map-container-transporte-${resource.count}`, 'transporte', resource.count);
                     } else if (type === 'humanos') {
-                        initMap(`map-container-humano-${resource.count}`);
+                        resources.humanos.maps[resource.count] = initMap(`map-container-humano-${resource.count}`, 'humanos', resource.count);
                     } else if (type === 'herramientas') {
-                        initMap(`map-container-herramienta-${resource.count}`);
+                        resources.herramientas.maps[resource.count] = initMap(`map-container-herramienta-${resource.count}`, 'herramientas', resource.count);
                     }
                 }, 0);
             }
@@ -2251,6 +2264,8 @@
                 }
 
                 resource.count--;
+                // Actualizar el campo hidden del contador
+                document.getElementById(`${type}_count`).value = resource.count;
                 resource.current = Math.min(positionToDelete, resource.count);
                 updateCounter(type);
                 
@@ -2372,36 +2387,30 @@
                 }
             }
             
-            // Reemplazar el evento submit existente con este nuevo código:
             document.getElementById('main-form').addEventListener('submit', function(e) {
                 e.preventDefault();
                 
                 if (this.checkValidity()) {
                     // Recopilar todos los datos del formulario
                     const formData = new FormData(this);
-                    const data = Object.fromEntries(formData.entries());
+                    const data = {};
                     
-                    // Agregar datos de recursos dinámicos
-                    data.transporte_count = resources.transporte.count;
-                    data.humanos_count = resources.humanos.count;
-                    data.herramientas_count = resources.herramientas.count;
-                    
-                    // Agregar datos de coordenadas de mapas si existen
-                    for (const [type, resource] of Object.entries(resources)) {
-                        for (let i = 1; i <= resource.count; i++) {
-                            const mapContainer = document.getElementById(`map-container-${type}-${i}`);
-                            if (mapContainer && resource.maps && resource.maps[i]) {
-                                const mapData = resource.maps[i];
-                                data[`${type}_${i}_lat`] = mapData.latInput.value;
-                                data[`${type}_${i}_lng`] = mapData.lngInput.value;
+                    // Convertir FormData a objeto
+                    for (let [key, value] of formData.entries()) {
+                        // Manejar checkboxes (valores múltiples)
+                        if (key.endsWith('[]')) {
+                            const cleanKey = key.slice(0, -2);
+                            if (!data[cleanKey]) {
+                                data[cleanKey] = [];
                             }
+                            data[cleanKey].push(value);
+                        } else {
+                            data[key] = value;
                         }
                     }
                     
-                    // Reemplaza con tu URL de Web App de Google Apps Script
-                    const webAppUrl = 'https://script.google.com/macros/s/AKfycbysRSyKXOx2Uk5Y_1N06MONKTT1KjrLjqPxEro42qNBtvWGk_X-VMLnK1C2WH7ck1S0sw/exec';
-                    
-                    fetch(webAppUrl, {
+                    // Enviar datos al Google Apps Script
+                    fetch(SCRIPT_URL, {
                         method: 'POST',
                         mode: 'no-cors',
                         headers: {
@@ -2415,32 +2424,14 @@
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Hubo un error al enviar el formulario. Por favor, inténtelo nuevamente.');
+                        alert('Hubo un error al enviar el formulario. Por favor, inténtelo de nuevo.');
                     });
                 } else {
                     alert('Por favor complete todos los campos requeridos.');
                 }
             });
-            
-            // Modificar la función initMap para guardar referencia a los mapas
-            function initMap(containerId, resourceType, resourceId) {
-                // ... (todo el código existente de initMap)
-                
-                // Al final de la función, antes del return, agregar:
-                if (!resources[resourceType].maps) {
-                    resources[resourceType].maps = {};
-                }
-                
-                resources[resourceType].maps[resourceId] = {
-                    latInput: latInput,
-                    lngInput: lngInput,
-                    map: map,
-                    marker: marker
-                };
-                
-                // ... (el return se mantiene igual)
-            }
         });
     </script>
 </body>
 </html>
+
